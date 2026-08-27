@@ -485,35 +485,110 @@ function onXTorre(){
   });
 }
 
-function renderAcessos(){
-  const ft=document.getElementById('f-xt').value;
-  const fs=document.getElementById('f-xs').value;
-  const fb=document.getElementById('f-xb').value.toLowerCase();
-  let d=acessos;
+function renderAcessos() {
+  // ... código de filtros ...
 
-  if(ft) d=d.filter(a=>Number(a.torre_id)===Number(ft));
-  if(fs) d=d.filter(a=>a.status===fs);
-  if(fb) d=d.filter(a=>aNome(a.analista_id).toLowerCase().includes(fb)||cNome(a.cliente_id).toLowerCase().includes(fb));
+  const stb = {
+    liberado: '<span class="bd bg">Liberado</span>',
+    pendente: '<span class="bd br">Pendente</span>',
+    em_validacao: '<span class="bd bo">Validação</span>'
+  };
 
-  const stb={liberado:'<span class="bd bg">Liberado</span>',pendente:'<span class="bd br">Pendente</span>',em_validacao:'<span class="bd bo">Validação</span>'};
-  document.getElementById('xtb').innerHTML=d.map(a=>
-    `<tr><td>${a.id}</td><td>${tNome(a.torre_id)}</td><td>${aNome(a.analista_id)}</td><td>${cNome(a.cliente_id)}</td><td>${stb[a.status]||a.status}</td><td>${a.obs||'-'}</td><td>${new Date(a.updated_at).toLocaleString('pt-BR')}</td><td><button class="bs bdr" onclick="delAcesso(${a.id})">Excluir</button></td></tr>`
-  ).join('')||'<tr><td colspan="8" style="text-align:center;color:#999;">Nenhum acesso</td></tr>';
+  document.getElementById('xtb').innerHTML = d.map(a => `
+    <tr>
+      <td>${a.id}</td>
+      <td>${tNome(a.torre_id)}</td>
+      <td>${aNome(a.analista_id)}</td>
+      <td>${cNome(a.cliente_id)}</td>
+      <td>${stb[a.status] || a.status}</td>
+      <td>${a.obs || '-'}</td>  <!-- ← USE "obs" aqui -->
+      <td>${new Date(a.updated_at).toLocaleString('pt-BR')}</td>
+      <td>
+        <button class="bs bdo" onclick="editAcesso(${a.id})">Editar</button>
+        <button class="bs bdr" onclick="delAcesso(${a.id})">Excluir</button>
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="8" style="text-align:center;color:#999;">Nenhum acesso encontrado.</td></tr>';
 }
 
-async function addAcesso(){
-  const t=document.getElementById('i-xt').value;
-  const a=document.getElementById('i-xa').value;
-  const c=document.getElementById('i-xc').value;
-  const s=document.getElementById('i-xs').value;
-  const o=document.getElementById('i-xo').value.trim();
-  if(!t||!a||!c){toast('Preencha torre, analista e cliente','er');return;}
-  try{
-    await sf('/acessos',{method:'POST',body:JSON.stringify({torre_id:Number(t),analista_id:Number(a),cliente_id:Number(c),status:s,obs:o||null})});
-    toast('Acesso registrado!');
-    document.getElementById('i-xo').value='';
+function editAcesso(id) {
+  const a = acessos.find(x => x.id === id);
+  if (!a) return;
+
+  document.getElementById('i-xt').value = a.torre_id || '';
+  onXTorre(); // Popula analistas e clientes da torre
+  document.getElementById('i-xa').value = a.analista_id || '';
+  document.getElementById('i-xc').value = a.cliente_id || '';
+  document.getElementById('i-xs').value = a.status || 'pendente';
+  document.getElementById('i-xo').value = a.obs || '';  // ← USE "obs" aqui
+
+  // Muda o botão para "Atualizar"
+  const btn = document.querySelector('#pg-acessos .btn.bp');
+  btn.textContent = 'Atualizar';
+  btn.onclick = () => updateAcesso(id);
+}
+
+async function updateAcesso(id) {
+  const t = document.getElementById('i-xt').value;
+  const a = document.getElementById('i-xa').value;
+  const c = document.getElementById('i-xc').value;
+  const s = document.getElementById('i-xs').value;
+  const o = document.getElementById('i-xo').value.trim();
+
+  if (!t || !a || !c) {
+    toast('Preencha torre, analista e cliente', 'er');
+    return;
+  }
+
+  try {
+    await sf(`/acessos?id=eq.${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        torre_id: Number(t),
+        analista_id: Number(a),
+        cliente_id: Number(c),
+        status: s,
+        obs: o  // ← USE "obs" aqui
+      })
+    });
+    toast('Acesso atualizado!');
     await loadAll();
-  }catch(e){toast('Erro: '+e.message,'er');}
+    resetFormAcesso();
+  } catch (e) {
+    toast('Erro: ' + e.message, 'er');
+  }
+}
+
+async function addAcesso() {
+  const t = document.getElementById('i-xt').value;
+  const a = document.getElementById('i-xa').value;
+  const c = document.getElementById('i-xc').value;
+  const s = document.getElementById('i-xs').value;
+  const o = document.getElementById('i-xo').value.trim();
+
+  if (!t || !a || !c) {
+    toast('Preencha torre, analista e cliente', 'er');
+    return;
+  }
+
+  try {
+    await sf('/acessos', {
+      method: 'POST',
+      body: JSON.stringify({
+        torre_id: Number(t),
+        analista_id: Number(a),
+        cliente_id: Number(c),
+        status: s,
+        obs: o  // ← USE "obs" aqui
+      })
+    });
+    toast('Acesso registrado!');
+    document.getElementById('i-xo').value = '';
+    await loadAll();
+    sendNotif(s, { analista: aNome(a), cliente: cNome(c), torre: tNome(t) });
+  } catch (e) {
+    toast('Erro: ' + e.message, 'er');
+  }
 }
 
 function delAcesso(id){
