@@ -1,130 +1,679 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Acesso</title>
-    <style>
-        :root {
-            --primary-red: #BF0411;
-            --darker-red: #C00000;
-            --light-gray: #E9E9E9;
-            --medium-gray: #CBCBCB;
-            --text-color: #333;
-            --white: #FFFFFF;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--light-gray);
-            color: var(--text-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            background-color: var(--white);
-            padding: 30px 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 500px;
-        }
-
-        h1 {
-            color: var(--primary-red);
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 24px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--medium-gray);
-            border-radius: 5px;
-            font-size: 16px;
-            transition: border-color 0.2s;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary-red);
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 5px;
-            background-color: var(--primary-red);
-            color: var(--white);
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        button:hover {
-            background-color: var(--darker-red);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestão de Acessos — Torres</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+:root{--red:#BF0411;--rd:#C00000;--gl:#E9E9E9;--gm:#CBCBCB;--w:#fff;--d:#1a1a1a;--grn:#2ecc71;--org:#e67e22;--f:'Segoe UI',system-ui,sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--f);background:var(--gl);color:var(--d);min-height:100vh}
+.nav{background:linear-gradient(135deg,var(--red),var(--rd));padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px;box-shadow:0 2px 12px rgba(0,0,0,.15);position:sticky;top:0;z-index:100}
+.nav h1{color:var(--w);font-size:1.1rem;font-weight:700}
+.nav nav{display:flex;gap:4px}
+.nav nav button{background:rgba(255,255,255,.12);color:var(--w);border:1px solid rgba(255,255,255,.2);padding:8px 16px;border-radius:6px;cursor:pointer;font-size:.82rem;font-weight:500;transition:.2s}
+.nav nav button:hover,.nav nav button.act{background:var(--w);color:var(--red);font-weight:700}
+.wrap{max-width:1440px;margin:0 auto;padding:1.5rem}
+.pg{display:none}.pg.act{display:block}
+.kr{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:1rem;margin-bottom:1.5rem}
+.kc{background:var(--w);border-radius:12px;padding:1.1rem;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid var(--red)}
+.kc .n{font-size:2rem;font-weight:800;color:var(--red)}.kc .l{font-size:.76rem;color:#666;margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+.kc.g{border-left-color:var(--grn)}.kc.g .n{color:var(--grn)}
+.kc.o{border-left-color:var(--org)}.kc.o .n{color:var(--org)}
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem}
+.cc{background:var(--w);border-radius:12px;padding:1.2rem;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.cc h3{font-size:.85rem;color:var(--d);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid var(--gl)}
+.tw{background:var(--w);border-radius:12px;padding:1.2rem;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow-x:auto;margin-bottom:1.5rem}
+.tw h3{font-size:.9rem;margin-bottom:1rem}
+table{width:100%;border-collapse:collapse;font-size:.83rem}
+thead th{background:var(--red);color:var(--w);padding:10px 12px;text-align:left;font-weight:600;white-space:nowrap}
+tbody td{padding:9px 12px;border-bottom:1px solid var(--gl)}
+tbody tr:hover{background:#fff5f5}
+.bd{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.73rem;font-weight:700}
+.bd.bg{background:#d4edda;color:#155724}.bd.br{background:#f8d7da;color:#721c24}.bd.bo{background:#fff3cd;color:#856404}
+.fc{background:var(--w);border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:1.5rem}
+.fc h3{margin-bottom:1rem;font-size:1rem;color:var(--red)}
+.fr{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1rem}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg label{font-size:.76rem;font-weight:600;color:#444;text-transform:uppercase;letter-spacing:.3px}
+.fg input,.fg select{padding:9px 12px;border:1.5px solid var(--gm);border-radius:8px;font-size:.87rem;transition:.2s;font-family:var(--f)}
+.fg input:focus,.fg select:focus{outline:none;border-color:var(--red)}
+.btn{padding:10px 22px;border:none;border-radius:8px;font-size:.83rem;font-weight:700;cursor:pointer;transition:.2s;font-family:var(--f);display:inline-flex;align-items:center;gap:6px}
+.bp{background:var(--red);color:var(--w)}.bp:hover{background:var(--rd);transform:translateY(-1px)}
+.bs{padding:5px 12px;font-size:.75rem;border:none;border-radius:6px;cursor:pointer;font-weight:600;color:var(--w)}
+.bdr{background:#dc3545}.bdg{background:var(--grn)}.bdo{background:var(--org)}
+.fb{display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:1.5rem;background:var(--w);padding:1rem 1.2rem;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.tc{position:fixed;top:70px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.tt{padding:12px 20px;border-radius:8px;font-size:.83rem;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,.2);animation:si .3s;color:#fff}
+.tt.ok{background:var(--grn)}.tt.er{background:#dc3545}.tt.in{background:var(--red)}
+@keyframes si{from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1}}
+.sd{width:8px;height:8px;border-radius:50%;background:var(--grn);display:inline-block;margin-right:6px;animation:pu 2s infinite}
+.sdr{background:#dc3545 !important;animation:none !important}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:.4}}
+.sbar{position:fixed;bottom:12px;right:16px;background:#222;color:#ccc;padding:6px 14px;border-radius:8px;font-size:.72rem;font-family:monospace;z-index:9999;display:flex;align-items:center;gap:6px}
+.modal-bg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:10000;display:none;align-items:center;justify-content:center}
+.modal-bg.show{display:flex}
+.modal{background:var(--w);border-radius:14px;padding:2rem;max-width:420px;width:90%;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.modal h3{margin-bottom:.8rem;color:var(--red)}.modal p{font-size:.9rem;color:#555;margin-bottom:1.5rem}
+.modal .btns{display:flex;gap:1rem;justify-content:center}
+.export-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem}
+.export-bar button{padding:7px 14px;border:1.5px solid var(--red);background:var(--w);color:var(--red);border-radius:6px;font-size:.78rem;font-weight:600;cursor:pointer;transition:.2s;font-family:var(--f);display:inline-flex;align-items:center;gap:5px}
+.export-bar button:hover{background:var(--red);color:var(--w)}
+.notif-card{background:var(--w);border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:1.5rem}
+.notif-card h3{margin-bottom:1rem;font-size:1rem}
+.notif-card.lib{border-left:4px solid var(--grn)}.notif-card.lib h3{color:var(--grn)}
+.notif-card.pend{border-left:4px solid var(--org)}.notif-card.pend h3{color:var(--org)}
+.notif-card.cfg{border-left:4px solid var(--red)}.notif-card.cfg h3{color:var(--red)}
+.nlog{max-height:350px;overflow-y:auto;font-size:.82rem}
+.nl{padding:10px 12px;border-bottom:1px solid var(--gl);display:flex;align-items:center;gap:10px}
+.nl .ni{font-size:1.2rem}.nl .nt{flex:1;line-height:1.4}.nl .nd{font-size:.72rem;color:#999;white-space:nowrap}
+.ntag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.68rem;font-weight:700;margin-right:6px}
+.ntag.tl{background:#d4edda;color:#155724}.ntag.tp{background:#fff3cd;color:#856404}
+.cfg-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--gl)}
+.cfg-row label{font-size:.85rem;flex:1}
+.cfg-row input[type=number]{width:70px;padding:6px 10px;border:1.5px solid var(--gm);border-radius:6px;font-size:.85rem}
+.toggle{position:relative;width:44px;height:24px;cursor:pointer}
+.toggle input{opacity:0;width:0;height:0}
+.toggle .slider{position:absolute;top:0;left:0;right:0;bottom:0;background:#ccc;border-radius:24px;transition:.3s}
+.toggle .slider:before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
+.toggle input:checked+.slider{background:var(--grn)}
+.toggle input:checked+.slider:before{transform:translateX(20px)}
+@media(max-width:768px){.cg{grid-template-columns:1fr}.nav{padding:8px;flex-wrap:wrap;height:auto;gap:8px}.nav nav{flex-wrap:wrap}.nav nav button{padding:6px 10px;font-size:.72rem}.fr{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Cadastro de Acesso</h1>
-        <form id="access-form">
-            <div class="form-group">
-                <label for="access-type">Tipo de Acesso</label>
-                <select id="access-type" name="access-type" required>
-                    <option value="ssh">SSH</option>
-                    <option value="rdp">RDP</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="access-name">Nome do Acesso</label>
-                <input type="text" id="access-name" name="access-name" placeholder="Ex: Servidor Principal" required>
-            </div>
-            <div class="form-group">
-                <label for="host">Host (IP ou Domínio)</label>
-                <input type="text" id="host" name="host" placeholder="192.168.1.100" required>
-            </div>
-            <div class="form-group">
-                <label for="port">Porta</label>
-                <input type="number" id="port" name="port" placeholder="22" required>
-            </div>
-            <div class="form-group">
-                <label for="username">Usuário</label>
-                <input type="text" id="username" name="username" placeholder="admin" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Senha ou Chave</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <button type="submit">Salvar Acesso</button>
-        </form>
-    </div>
+<div class="nav">
+  <h1>🔐 Gestão de Acessos — Torres</h1>
+  <nav id="navbtns">
+    <button class="act" data-p="dashboard" onclick="go(this)">📊 Dashboard</button>
+    <button data-p="analistas" onclick="go(this)">👤 Analistas</button>
+    <button data-p="acessos" onclick="go(this)">🔑 Acessos</button>
+    <button data-p="clientes" onclick="go(this)">🏢 Clientes</button>
+    <button data-p="notificacoes" onclick="go(this)">🔔 Notificações</button>
+  </nav>
+</div>
+<div class="tc" id="toasts"></div>
+<div class="sbar"><span class="sd" id="sdot"></span><span id="stxt">Conectando...</span></div>
 
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <h3>⚠️ Confirmar exclusão</h3>
+    <p id="modal-msg">Deseja realmente excluir?</p>
+    <div class="btns">
+      <button class="btn bp" onclick="modalYes()">Excluir</button>
+      <button class="btn" style="background:#666;color:#fff" onclick="modalNo()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- DASHBOARD -->
+<div class="pg act" id="pg-dashboard">
+  <div class="kr">
+    <div class="kc"><div class="n" id="k1">-</div><div class="l">Torres</div></div>
+    <div class="kc"><div class="n" id="k2">-</div><div class="l">Analistas</div></div>
+    <div class="kc"><div class="n" id="k3">-</div><div class="l">Contratos</div></div>
+    <div class="kc g"><div class="n" id="k4">-</div><div class="l">Acessos Liberados</div></div>
+    <div class="kc o"><div class="n" id="k5">-</div><div class="l">Acessos Pendentes</div></div>
+  </div>
+  <div class="export-bar">
+    <button onclick="exportDash('csv')">📄 CSV</button>
+    <button onclick="exportDash('xlsx')">📊 Excel</button>
+    <button onclick="exportDash('txt')">📝 TXT</button>
+    <button onclick="exportDash('pdf')">📕 PDF</button>
+  </div>
+  <div class="cg">
+    <div class="cc"><h3>📊 Analistas × Liberados × Contratos</h3><canvas id="c1"></canvas></div>
+    <div class="cc"><h3>🔴 Pendências por Torre</h3><canvas id="c2"></canvas></div>
+  </div>
+  <div class="cg">
+    <div class="cc"><h3>📈 % Liberados por Torre</h3><canvas id="c3"></canvas></div>
+    <div class="cc"><h3>🏢 Top 10 Clientes Pendências</h3><canvas id="c4"></canvas></div>
+  </div>
+  <div class="tw"><h3>📋 Resumo por Torre</h3>
+    <table><thead><tr><th>Torre</th><th>Contratos</th><th>Analistas</th><th>Liberados</th><th>Pendentes</th><th>% Lib.</th></tr></thead><tbody id="dtb"></tbody></table>
+  </div>
+</div>
+
+<!-- ANALISTAS -->
+<div class="pg" id="pg-analistas">
+  <div class="fc"><h3>➕ Cadastrar Analista</h3>
+    <div class="fr">
+      <div class="fg"><label>Nome</label><input id="i-an" placeholder="Ex: João Silva"></div>
+      <div class="fg"><label>Torre</label><select id="i-at"><option value="">Carregando...</option></select></div>
+      <div class="fg" style="justify-content:flex-end"><button class="btn bp" onclick="addAnalista()">Cadastrar</button></div>
+    </div>
+  </div>
+  <div class="export-bar">
+    <button onclick="exportTable('analistas','csv')">📄 CSV</button>
+    <button onclick="exportTable('analistas','xlsx')">📊 Excel</button>
+    <button onclick="exportTable('analistas','txt')">📝 TXT</button>
+    <button onclick="exportTable('analistas','pdf')">📕 PDF</button>
+  </div>
+  <div class="fb">
+    <div class="fg"><label>Filtrar Torre</label><select id="f-at" onchange="renderAnalistas()"><option value="">Todas</option></select></div>
+    <div class="fg"><label>Buscar</label><input id="f-an" placeholder="Nome..." oninput="renderAnalistas()"></div>
+  </div>
+  <div class="tw"><table><thead><tr><th>ID</th><th>Nome</th><th>Torre</th><th>Ações</th></tr></thead><tbody id="atb"></tbody></table></div>
+</div>
+
+<!-- ACESSOS -->
+<div class="pg" id="pg-acessos">
+  <div class="fc"><h3>🔑 Registrar / Atualizar Acesso</h3>
+    <div class="fr">
+      <div class="fg"><label>Torre</label><select id="i-xt" onchange="onXTorre()"><option value="">Selecione...</option></select></div>
+      <div class="fg"><label>Analista</label><select id="i-xa"><option value="">Selecione torre</option></select></div>
+      <div class="fg"><label>Cliente</label><select id="i-xc"><option value="">Selecione torre</option></select></div>
+      <div class="fg"><label>Status</label><select id="i-xs"><option value="liberado">✅ Liberado</option><option value="pendente" selected>⏳ Pendente</option><option value="em_validacao">🔍 Em Validação</option></select></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>Observação</label><input id="i-xo" placeholder="Opcional..."></div>
+      <div class="fg" style="justify-content:flex-end"><button class="btn bp" onclick="addAcesso()">Salvar Acesso</button></div>
+    </div>
+  </div>
+  <div class="export-bar">
+    <button onclick="exportTable('acessos','csv')">📄 CSV</button>
+    <button onclick="exportTable('acessos','xlsx')">📊 Excel</button>
+    <button onclick="exportTable('acessos','txt')">📝 TXT</button>
+    <button onclick="exportTable('acessos','pdf')">📕 PDF</button>
+  </div>
+  <div class="fb">
+    <div class="fg"><label>Torre</label><select id="f-xt" onchange="renderAcessos()"><option value="">Todas</option></select></div>
+    <div class="fg"><label>Status</label><select id="f-xs" onchange="renderAcessos()"><option value="">Todos</option><option value="liberado">Liberado</option><option value="pendente">Pendente</option><option value="em_validacao">Em Validação</option></select></div>
+    <div class="fg"><label>Buscar</label><input id="f-xb" placeholder="Analista ou cliente..." oninput="renderAcessos()"></div>
+  </div>
+  <div class="tw"><table><thead><tr><th>Analista</th><th>Torre</th><th>Cliente</th><th>Status</th><th>Obs</th><th>Ações</th></tr></thead><tbody id="xtb"></tbody></table></div>
+</div>
+
+<!-- CLIENTES -->
+<div class="pg" id="pg-clientes">
+  <div class="fc"><h3>🏢 Cadastrar Cliente</h3>
+    <div class="fr">
+      <div class="fg"><label>Nome</label><input id="i-cn" placeholder="Ex: PROFARMA"></div>
+      <div class="fg"><label>Torre</label><select id="i-ct"><option value="">Carregando...</option></select></div>
+      <div class="fg" style="justify-content:flex-end"><button class="btn bp" onclick="addCliente()">Cadastrar</button></div>
+    </div>
+  </div>
+  <div class="export-bar">
+    <button onclick="exportTable('clientes','csv')">📄 CSV</button>
+    <button onclick="exportTable('clientes','xlsx')">📊 Excel</button>
+    <button onclick="exportTable('clientes','txt')">📝 TXT</button>
+    <button onclick="exportTable('clientes','pdf')">📕 PDF</button>
+  </div>
+  <div class="fb">
+    <div class="fg"><label>Filtrar Torre</label><select id="f-ct" onchange="renderClientes()"><option value="">Todas</option></select></div>
+    <div class="fg"><label>Buscar</label><input id="f-cn" placeholder="Cliente..." oninput="renderClientes()"></div>
+  </div>
+  <div class="tw"><table><thead><tr><th>ID</th><th>Cliente</th><th>Torre</th><th>Ações</th></tr></thead><tbody id="ctb"></tbody></table></div>
+</div>
+
+<!-- NOTIFICAÇÕES -->
+<div class="pg" id="pg-notificacoes">
+  <div class="notif-card cfg">
+    <h3>⚙️ Configurações de Notificação</h3>
+    <div class="cfg-row">
+      <label>📧 Notificar ao <strong>liberar</strong> acesso</label>
+      <label class="toggle"><input type="checkbox" id="cfg-lib" checked onchange="saveCfg()"><span class="slider"></span></label>
+    </div>
+    <div class="cfg-row">
+      <label>⏳ Notificar pendências a cada <strong id="cfg-dias-lbl">4</strong> dias úteis</label>
+      <input type="number" id="cfg-dias" value="4" min="1" max="30" onchange="saveCfg();document.getElementById('cfg-dias-lbl').textContent=this.value">
+      <label class="toggle"><input type="checkbox" id="cfg-pend" checked onchange="saveCfg()"><span class="slider"></span></label>
+    </div>
+    <div class="cfg-row">
+      <label>📩 Destinatário: <code>carlos.pessotti@service.com.br</code></label>
+    </div>
+    <p style="font-size:.75rem;color:#999;margin-top:8px;">Pendências são verificadas seg–sex. Finais de semana não contam.</p>
+  </div>
+  <div class="notif-card lib">
+    <h3>✅ Últimas Liberações Notificadas</h3>
+    <div class="nlog" id="log-lib"><p style="color:#999;font-size:.82rem;padding:12px;">Nenhuma notificação ainda.</p></div>
+  </div>
+  <div class="notif-card pend">
+    <h3>⏳ Últimas Pendências Notificadas</h3>
+    <div class="nlog" id="log-pend"><p style="color:#999;font-size:.82rem;padding:12px;">Nenhuma notificação ainda.</p></div>
+  </div>
+</div>
+
+</div>
+
+javascript:
+
+
+<script>
+/* ═══════════════════════════════════════
+   CONFIG SUPABASE + EMAILJS
+   ═══════════════════════════════════════ */
+const SB='https://mwwlimmkiphwdeleewzd.supabase.co/rest/v1';
+const AK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13d2xpbW1raXBod2RlbGVld3pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2MTYyMDMsImV4cCI6MjA2OTE5MjIwM30.R5KVB1G4kLttC2miVnEse5hk7BQNP0E8t0buACOpZOg';
+const HD={'apikey':AK,'Authorization':'Bearer '+AK,'Content-Type':'application/json','Prefer':'return=representation'};
+
+const EJS_PK='iU9eUIjC9pv_1RRco';
+const EJS_SVC='service_torres';
+const EJS_TPL_LIB='acesso_liberado_service';
+const EJS_TPL_PEND='acesso_pendente_service';
+const SYSTEM_URL='https://heartfelt-elf-35a866.netlify.app/';
+
+emailjs.init(EJS_PK);
+
+let torres=[],analistas=[],clientes=[],acessos=[];
+let charts={};
+let modalCb=null;
+let notifLog=JSON.parse(localStorage.getItem('notifLog')||'{"lib":[],"pend":[]}');
+
+/* ═══ NAVEGAÇÃO ═══ */
+function go(b){document.querySelectorAll('.nav nav button').forEach(x=>x.classList.remove('act'));b.classList.add('act');document.querySelectorAll('.pg').forEach(p=>p.classList.remove('act'));document.getElementById('pg-'+b.dataset.p).classList.add('act');if(b.dataset.p==='notificacoes')renderNotifLogs();}
+
+/* ═══ TOAST ═══ */
+function toast(m,t='ok'){const d=document.createElement('div');d.className='tt '+t;d.textContent=m;document.getElementById('toasts').appendChild(d);setTimeout(()=>d.remove(),4000);}
+
+/* ═══ MODAL ═══ */
+function modalShow(msg,cb){document.getElementById('modal-msg').textContent=msg;modalCb=cb;document.getElementById('modal').classList.add('show');}
+function modalYes(){document.getElementById('modal').classList.remove('show');if(modalCb)modalCb();}
+function modalNo(){document.getElementById('modal').classList.remove('show');modalCb=null;}
+
+/* ═══ SUPABASE FETCH ═══ */
+async function sf(ep,opt={}){const r=await fetch(SB+ep,{headers:HD,...opt});if(!r.ok)throw new Error(r.statusText);const t=await r.text();return t?JSON.parse(t):[];}
+
+/* ═══ CARREGAR DADOS ═══ */
+async function loadAll(){
+  try{
+    [torres,analistas,clientes,acessos]=await Promise.all([sf('/torres?select=*'),sf('/analistas?select=*'),sf('/clientes?select=*'),sf('/acessos?select=*')]);
+    document.getElementById('sdot').className='sd';document.getElementById('stxt').textContent='Sync ativo';
+    renderAll();
+    checkPendNotif();
+  }catch(e){document.getElementById('sdot').className='sd sdr';document.getElementById('stxt').textContent='Erro: '+e.message;toast('Erro ao carregar dados','er');}
+}
+
+function tNome(id){return(torres.find(t=>t.id==id)||{}).nome||'?';}
+function aNome(id){return(analistas.find(a=>a.id==id)||{}).nome||'?';}
+function cNome(id){return(clientes.find(c=>c.id==id)||{}).nome||'?';}
+function aTorre(id){return(analistas.find(a=>a.id==id)||{}).torre_id||0;}
+
+/* ═══ POPULATE SELECTS ═══ */
+function popSel(){
+  const sels=['i-at','i-ct','i-xt','f-at','f-ct','f-xt'];
+  sels.forEach(id=>{const s=document.getElementById(id);if(!s)return;const v=s.value;const isF=id.startsWith('f');s.innerHTML=isF?'<option value="">Todas</option>':'<option value="">Selecione...</option>';torres.forEach(t=>{s.innerHTML+=`<option value="${t.id}">${t.nome}</option>`;});s.value=v;});
+}
+
+/* ═══ RENDER ALL ═══ */
+function renderAll(){popSel();renderDash();renderAnalistas();renderClientes();renderAcessos();}
+
+/* ═══ DASHBOARD ═══ */
+function renderDash(){
+  const lib=acessos.filter(a=>a.status==='liberado').length;
+  const pend=acessos.filter(a=>a.status==='pendente').length;
+  document.getElementById('k1').textContent=torres.length;
+  document.getElementById('k2').textContent=analistas.length;
+  document.getElementById('k3').textContent=clientes.length;
+  document.getElementById('k4').textContent=lib;
+  document.getElementById('k5').textContent=pend;
+
+  const ds=torres.map(t=>{
+    const ta=analistas.filter(a=>a.torre_id==t.id);
+    const tc=clientes.filter(c=>c.torre_id==t.id);
+    const aids=ta.map(a=>a.id);
+    const tl=acessos.filter(a=>aids.includes(a.analista_id)&&a.status==='liberado').length;
+    const tp=acessos.filter(a=>aids.includes(a.analista_id)&&a.status==='pendente').length;
+    const pct=(tl+tp)>0?Math.round(tl/(tl+tp)*100):0;
+    return{nome:t.nome,an:ta.length,cl:tc.length,lib:tl,pend:tp,pct};
+  });
+
+  // Tabela resumo
+  const tb=document.getElementById('dtb');
+  tb.innerHTML=ds.map(d=>`<tr><td>${d.nome}</td><td>${d.cl}</td><td>${d.an}</td><td>${d.lib}</td><td>${d.pend}</td><td><strong>${d.pct}%</strong></td></tr>`).join('');
+
+  // Charts
+  const lbls=ds.map(d=>d.nome.replace('BR ',''));
+  function mk(id,cfg){if(charts[id])charts[id].destroy();charts[id]=new Chart(document.getElementById(id),cfg);}
+
+  mk('c1',{type:'bar',data:{labels:lbls,datasets:[{label:'Analistas',data:ds.map(d=>d.an),backgroundColor:'#BF0411'},{label:'Liberados',data:ds.map(d=>d.lib),backgroundColor:'#2ecc71'},{label:'Contratos',data:ds.map(d=>d.cl),backgroundColor:'#3498db'}]},options:{responsive:true,scales:{y:{beginAtZero:true}},plugins:{legend:{position:'bottom'}}}});
+  mk('c2',{type:'bar',data:{labels:lbls,datasets:[{label:'Pendentes',data:ds.map(d=>d.pend),backgroundColor:'#BF0411'}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}}}});
+  mk('c3',{type:'bar',data:{labels:lbls,datasets:[{label:'% Liberados',data:ds.map(d=>d.pct),backgroundColor:'#2ecc71'}]},options:{responsive:true,scales:{y:{beginAtZero:true,max:100}},plugins:{legend:{display:false}}}});
+
+  // Top 10 clientes pendências
+  const cp={};
+  acessos.filter(a=>a.status==='pendente').forEach(a=>{const n=cNome(a.cliente_id);cp[n]=(cp[n]||0)+1;});
+  const top=Object.entries(cp).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  mk('c4',{type:'bar',data:{labels:top.map(t=>t[0]),datasets:[{label:'Pendências',data:top.map(t=>t[1]),backgroundColor:'#e67e22'}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}}}});
+}
+
+/* ═══ ANALISTAS ═══ */
+function renderAnalistas(){
+  const ft=document.getElementById('f-at').value;
+  const fn=document.getElementById('f-an').value.toLowerCase();
+  let d=analistas;
+  if(ft)d=d.filter(a=>a.torre_id==ft);
+  if(fn)d=d.filter(a=>a.nome.toLowerCase().includes(fn));
+  document.getElementById('atb').innerHTML=d.map(a=>`<tr><td>${a.id}</td><td>${a.nome}</td><td>${tNome(a.torre_id)}</td><td><button class="bs bdr" onclick="delAnalista(${a.id},'${a.nome.replace(/'/g,"\\'")}')">Excluir</button></td></tr>`).join('')||'<tr><td colspan="4" style="text-align:center;color:#999;">Nenhum analista</td></tr>';
+}
+async function addAnalista(){
+  const n=document.getElementById('i-an').value.trim();const t=document.getElementById('i-at').value;
+  if(!n||!t){toast('Preencha nome e torre','er');return;}
+  try{await sf('/analistas',{method:'POST',body:JSON.stringify({nome:n,torre_id:+t})});toast('Analista cadastrado!');document.getElementById('i-an').value='';await loadAll();}catch(e){toast('Erro: '+e.message,'er');}
+}
+function delAnalista(id,nome){modalShow(`Excluir analista "${nome}"?`,async()=>{try{await sf('/analistas?id=eq.'+id,{method:'DELETE'});toast('Analista excluído!');await loadAll();}catch(e){toast('Erro: '+e.message,'er');}});}
+
+/* ═══ CLIENTES ═══ */
+function renderClientes(){
+  const ft=document.getElementById('f-ct').value;
+  const fn=document.getElementById('f-cn').value.toLowerCase();
+  let d=clientes;
+  if(ft)d=d.filter(c=>c.torre_id==ft);
+  if(fn)d=d.filter(c=>c.nome.toLowerCase().includes(fn));
+  document.getElementById('ctb').innerHTML=d.map(c=>`<tr><td>${c.id}</td><td>${c.nome}</td><td>${tNome(c.torre_id)}</td><td><button class="bs bdr" onclick="delCliente(${c.id},'${c.nome.replace(/'/g,"\\'")}')">Excluir</button></td></tr>`).join('')||'<tr><td colspan="4" style="text-align:center;color:#999;">Nenhum cliente</td></tr>';
+}
+async function addCliente(){
+  const n=document.getElementById('i-cn').value.trim();const t=document.getElementById('i-ct').value;
+  if(!n||!t){toast('Preencha nome e torre','er');return;}
+  try{await sf('/clientes',{method:'POST',body:JSON.stringify({nome:n,torre_id:+t})});toast('Cliente cadastrado!');document.getElementById('i-cn').value='';await loadAll();}catch(e){toast('Erro: '+e.message,'er');}
+}
+function delCliente(id,nome){modalShow(`Excluir cliente "${nome}"?`,async()=>{try{await sf('/clientes?id=eq.'+id,{method:'DELETE'});toast('Cliente excluído!');await loadAll();}catch(e){toast('Erro: '+e.message,'er');}});}
+
+/* ═══ ACESSOS ═══ */
+function onXTorre(){
+  const t=document.getElementById('i-xt').value;
+  const sa=document.getElementById('i-xa');const sc=document.getElementById('i-xc');
+  sa.innerHTML='<option value="">Selecione...</option>';sc.innerHTML='<option value="">Selecione...</option>';
+  if(!t)return;
+  analistas.filter(a=>a.torre_id==t).forEach(a=>{sa.innerHTML+=`<option value="${a.id}">${a.nome}</option>`;});
+  clientes.filter(c=>c.torre_id==t).forEach(c=>{sc.innerHTML+=`<option value="${c.id}">${c.nome}</option>`;});
+}
+function renderAcessos(){
+  const ft=document.getElementById('f-xt').value;
+  const fs=document.getElementById('f-xs').value;
+  const fb=document.getElementById('f-xb').value.toLowerCase();
+  let d=acessos;
+  if(ft)d=d.filter(a=>aTorre(a.analista_id)==ft);
+  if(fs)d=d.filter(a=>a.status===fs);
+  if(fb)d=d.filter(a=>aNome(a.analista_id).toLowerCase().includes(fb)||cNome(a.cliente_id).toLowerCase().includes(fb));
+  const stb={liberado:'<span class="bd bg">Liberado</span>',pendente:'<span class="bd br">Pendente</span>',em_validacao:'<span class="bd bo">Validação</span>'};
+  document.getElementById('xtb').innerHTML=d.map(a=>`<tr><td>${aNome(a.analista_id)}</td><td>${tNome(aTorre(a.analista_id))}</td><td>${cNome(a.cliente_id)}</td><td>${stb[a.status]||a.status}</td><td>${a.observacao||'—'}</td><td><button class="bs bdr" onclick="delAcesso(${a.id})">Excluir</button></td></tr>`).join('')||'<tr><td colspan="6" style="text-align:center;color:#999;">Nenhum acesso</td></tr>';
+}
+async function addAcesso(){
+  const ai=document.getElementById('i-xa').value;const ci=document.getElementById('i-xc').value;
+  const st=document.getElementById('i-xs').value;const ob=document.getElementById('i-xo').value.trim();
+  if(!ai||!ci){toast('Selecione analista e cliente','er');return;}
+
+  // Verifica se já existe
+  const exist=acessos.find(a=>a.analista_id==ai&&a.cliente_id==ci);
+  try{
+    let rec;
+    if(exist){
+      [rec]=await sf('/acessos?id=eq.'+exist.id,{method:'PATCH',body:JSON.stringify({status:st,observacao:ob,updated_at:new Date().toISOString()})});
+      toast('Acesso atualizado!');
+    }else{
+      [rec]=await sf('/acessos',{method:'POST',body:JSON.stringify({analista_id:+ai,cliente_id:+ci,status:st,observacao:ob,updated_at:new Date().toISOString()})});
+      toast('Acesso registrado!');
+    }
+    document.getElementById('i-xo').value='';
+    await loadAll();
+
+    // Notifica liberação
+    if(st==='liberado'&&getCfg().lib){
+      sendLibEmail(rec||{analista_id:+ai,cliente_id:+ci,observacao:ob});
+    }
+  }catch(e){toast('Erro: '+e.message,'er');}
+}
+function delAcesso(id){modalShow('Excluir este acesso?',async()=>{try{await sf('/acessos?id=eq.'+id,{method:'DELETE'});toast('Acesso excluído!');await loadAll();}catch(e){toast('Erro: '+e.message,'er');}});}
+
+/* ═══ EXPORTAÇÃO ═══ */
+function getDashData(){
+  return torres.map(t=>{
+    const ta=analistas.filter(a=>a.torre_id==t.id);
+    const tc=clientes.filter(c=>c.torre_id==t.id);
+    const aids=ta.map(a=>a.id);
+    const tl=acessos.filter(a=>aids.includes(a.analista_id)&&a.status==='liberado').length;
+    const tp=acessos.filter(a=>aids.includes(a.analista_id)&&a.status==='pendente').length;
+    const pct=(tl+tp)>0?Math.round(tl/(tl+tp)*100):0;
+    return{Torre:t.nome,Contratos:tc.length,Analistas:ta.length,Liberados:tl,Pendentes:tp,'% Lib.':pct+'%'};
+  });
+}
+function getTableData(type){
+  if(type==='analistas')return analistas.map(a=>({ID:a.id,Nome:a.nome,Torre:tNome(a.torre_id)}));
+  if(type==='clientes')return clientes.map(c=>({ID:c.id,Cliente:c.nome,Torre:tNome(c.torre_id)}));
+  if(type==='acessos')return acessos.map(a=>({Analista:aNome(a.analista_id),Torre:tNome(aTorre(a.analista_id)),Cliente:cNome(a.cliente_id),Status:a.status,Observação:a.observacao||'',Atualizado:a.updated_at?new Date(a.updated_at).toLocaleDateString('pt-BR'):''}));
+  return[];
+}
+function downloadFile(content,name,mime){
+  const b=new Blob([content],{type:mime});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);
+}
+function toCSV(data){
+  if(!data.length)return'';
+  const h=Object.keys(data[0]);
+  return[h.join(';'),...data.map(r=>h.map(k=>'"'+(r[k]??'')+'"').join(';'))].join('\n');
+}
+function toTXT(data,title){
+  if(!data.length)return'Sem dados.';
+  const h=Object.keys(data[0]);
+  const widths=h.map(k=>Math.max(k.length,...data.map(r=>String(r[k]??'').length)));
+  const sep=widths.map(w=>'─'.repeat(w+2)).join('┼');
+  const row=r=>h.map((k,i)=>(' '+String(r[k]??'').padEnd(widths[i])+' ')).join('│');
+  return`RELATÓRIO: ${title.toUpperCase()}\nGerado em: ${new Date().toLocaleString('pt-BR')}\n${'═'.repeat(60)}\n`+row(Object.fromEntries(h.map(k=>[k,k])))+'\n┼'+sep+'┼\n'+data.map(r=>row(r)).join('\n');
+}
+function toPDF(data,title){
+  const{jsPDF}=window.jspdf;const doc=new jsPDF();
+  doc.setFontSize(16);doc.setTextColor(191,4,17);doc.text('Gestão de Acessos — Torres',14,20);
+  doc.setFontSize(11);doc.setTextColor(60);doc.text(title,14,28);
+  doc.setFontSize(8);doc.setTextColor(150);doc.text('Gerado em: '+new Date().toLocaleString('pt-BR'),14,34);
+  if(!data.length){doc.text('Sem dados.',14,44);doc.save(title+'.pdf');return;}
+  const h=Object.keys(data[0]);
+  doc.autoTable({startY:38,head:[h],body:data.map(r=>h.map(k=>r[k]??'')),styles:{fontSize:8,cellPadding:3},headStyles:{fillColor:[191,4,17],textColor:255,fontStyle:'bold'},alternateRowStyles:{fillColor:[249,249,249]}});
+  doc.save(title+'.pdf');
+}
+function exportDash(fmt){
+  const d=getDashData();const title='Resumo Dashboard';
+  if(fmt==='csv'){downloadFile('\uFEFF'+toCSV(d),title+'.csv','text/csv;charset=utf-8');}
+  else if(fmt==='xlsx'){const ws=XLSX.utils.json_to_sheet(d);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Dashboard');XLSX.writeFile(wb,title+'.xlsx');}
+  else if(fmt==='txt'){downloadFile(toTXT(d,title),title+'.txt','text/plain;charset=utf-8');}
+  else if(fmt==='pdf'){toPDF(d,title);}
+  toast('Exportado: '+fmt.toUpperCase());
+}
+function exportTable(type,fmt){
+  const d=getTableData(type);const title=type.charAt(0).toUpperCase()+type.slice(1);
+  if(fmt==='csv'){downloadFile('\uFEFF'+toCSV(d),title+'.csv','text/csv;charset=utf-8');}
+  else if(fmt==='xlsx'){const ws=XLSX.utils.json_to_sheet(d);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,title);XLSX.writeFile(wb,title+'.xlsx');}
+  else if(fmt==='txt'){downloadFile(toTXT(d,title),title+'.txt','text/plain;charset=utf-8');}
+  else if(fmt==='pdf'){toPDF(d,title);}
+  toast('Exportado: '+fmt.toUpperCase());
+}
+</script>
+
+
+emailjs:
+
+<script>
+/* ══════════════════════════════════════
+   FILTRO DINÂMICO DE ANALISTA/CLIENTE POR TORRE (Aba Acessos)
+   ══════════════════════════════════════ */
+
+// Chame esta função no onchange do select de Torre na aba Acessos
+function onTorreAcessoChange() {
+    const torreId = document.getElementById('i-xt').value; // select de Torre no form de Acessos
+    
+    // Filtra analistas pela torre selecionada
+    const selAnalista = document.getElementById('i-xa'); // select de Analista no form de Acessos
+    selAnalista.innerHTML = '<option value="">Selecione</option>';
+    
+    const analistasFiltrados = torreId 
+        ? analistas.filter(a => String(a.torre_id) === String(torreId))
+        : analistas;
+    
+    analistasFiltrados.forEach(a => {
+        selAnalista.innerHTML += `<option value="${a.id}">${a.nome}</option>`;
+    });
+
+    // Filtra clientes pela torre selecionada
+    const selCliente = document.getElementById('i-xc'); // select de Cliente no form de Acessos
+    selCliente.innerHTML = '<option value="">Selecione</option>';
+    
+    const clientesFiltrados = torreId 
+        ? clientes.filter(c => String(c.torre_id) === String(torreId))
+        : clientes;
+    
+    clientesFiltrados.forEach(c => {
+        selCliente.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
+    });
+}
+
+/* ═══════════════════════════════════════
+   NOTIFICAÇÕES POR E-MAIL (EmailJS)
+   ═══════════════════════════════════════ */
+
+/* Config persistente */
+function getCfg(){
+  const d=JSON.parse(localStorage.getItem('notifCfg')||'null');
+  return d||{lib:true,pend:true,dias:4};
+}
+function saveCfg(){
+  const cfg={lib:document.getElementById('cfg-lib').checked,pend:document.getElementById('cfg-pend').checked,dias:parseInt(document.getElementById('cfg-dias').value)||4};
+  localStorage.setItem('notifCfg',JSON.stringify(cfg));
+  toast('Configurações salvas!');
+}
+function loadCfg(){
+  const c=getCfg();
+  document.getElementById('cfg-lib').checked=c.lib;
+  document.getElementById('cfg-pend').checked=c.pend;
+  document.getElementById('cfg-dias').value=c.dias;
+  document.getElementById('cfg-dias-lbl').textContent=c.dias;
+}
+
+/* Contar dias úteis entre duas datas */
+function diasUteis(from,to){
+  let count=0;const d=new Date(from);
+  while(d<to){const dow=d.getDay();if(dow!==0&&dow!==6)count++;d.setDate(d.getDate()+1);}
+  return count;
+}
+
+/* Hoje é dia útil? */
+function isBusinessDay(){const dow=new Date().getDay();return dow>=1&&dow<=5;}
+
+/* ═══ E-MAIL LIBERAÇÃO ═══ */
+async function sendLibEmail(rec){
+  const an=analistas.find(a=>a.id==rec.analista_id)||{};
+  const cl=clientes.find(c=>c.id==rec.cliente_id)||{};
+  const tr=torres.find(t=>t.id==an.torre_id)||{};
+
+  // Stats da torre
+  const aids=analistas.filter(a=>a.torre_id==an.torre_id).map(a=>a.id);
+  const lib=acessos.filter(a=>aids.includes(a.analista_id)&&a.status==='liberado').length;
+  const pend=acessos.filter(a=>aids.includes(a.analista_id)&&a.status==='pendente').length;
+  const total=lib+pend;const pct=total>0?Math.round(lib/total*100):0;
+
+  const params={
+    torre:tr.nome||'—',
+    analista:an.nome||'—',
+    cliente:cl.nome||'—',
+    data:new Date().toLocaleDateString('pt-BR'),
+    observacao:rec.observacao||'Sem observação',
+    liberados:String(lib),
+    pendentes:String(pend),
+    percentual:String(pct),
+    url_sistema:SYSTEM_URL
+  };
+
+  try{
+    await emailjs.send(EJS_SVC,EJS_TPL_LIB,params);
+    toast('📧 E-mail de liberação enviado!');
+    addLog('lib',`✅ ${an.nome} → ${cl.nome} (${tr.nome})`);
+  }catch(e){
+    console.error('EmailJS erro:',e);
+    toast('Erro ao enviar e-mail','er');
+  }
+}
+
+/* ═══ E-MAIL PENDÊNCIA ═══ */
+async function sendPendEmail(acesso,dias){
+  const an=analistas.find(a=>a.id==acesso.analista_id)||{};
+  const cl=clientes.find(c=>c.id==acesso.cliente_id)||{};
+  const tr=torres.find(t=>t.id==an.torre_id)||{};
+
+  const params={
+    torre:tr.nome||'—',
+    analista:an.nome||'—',
+    cliente:cl.nome||'—',
+    dias:String(dias),
+    data_inicio:acesso.updated_at?new Date(acesso.updated_at).toLocaleDateString('pt-BR'):'—',
+    observacao:acesso.observacao||'Sem observação',
+    url_sistema:SYSTEM_URL
+  };
+
+  try{
+    await emailjs.send(EJS_SVC,EJS_TPL_PEND,params);
+    addLog('pend',`⏳ ${an.nome} → ${cl.nome} (${tr.nome}) — ${dias} dias úteis`);
+    return true;
+  }catch(e){
+    console.error('EmailJS erro:',e);
+    return false;
+  }
+}
+
+/* ═══ CHECAGEM DE PENDÊNCIAS ═══ */
+function checkPendNotif(){
+  const cfg=getCfg();
+  if(!cfg.pend)return;
+  if(!isBusinessDay())return; // só seg-sex
+
+  const now=new Date();
+  const sent=JSON.parse(localStorage.getItem('pendSent')||'{}');
+  const pending=acessos.filter(a=>a.status==='pendente');
+  let count=0;
+
+  pending.forEach(a=>{
+    if(!a.updated_at)return;
+    const du=diasUteis(new Date(a.updated_at),now);
+    if(du<cfg.dias)return; // ainda não atingiu X dias úteis
+
+    // Verifica se já notificou nesta faixa
+    const key=a.id+'_'+Math.floor(du/cfg.dias);
+    if(sent[key])return;
+
+    // Só envia se é múltiplo de X dias úteis (4, 8, 12...)
+    if(du%cfg.dias!==0)return;
+
+    sendPendEmail(a,du);
+    sent[key]=now.toISOString();
+    count++;
+  });
+
+  if(count>0){
+    localStorage.setItem('pendSent',JSON.stringify(sent));
+    toast(`📧 ${count} notificação(ões) de pendência enviada(s)!`);
+  }
+}
+
+/* ═══ LOG DE NOTIFICAÇÕES ═══ */
+function addLog(type,msg){
+  notifLog[type].unshift({msg,date:new Date().toISOString()});
+  if(notifLog[type].length>50)notifLog[type]=notifLog[type].slice(0,50);
+  localStorage.setItem('notifLog',JSON.stringify(notifLog));
+  renderNotifLogs();
+}
+function renderNotifLogs(){
+  ['lib','pend'].forEach(type=>{
+    const el=document.getElementById('log-'+type);
+    if(!notifLog[type].length){el.innerHTML='<p style="color:#999;font-size:.82rem;padding:12px;">Nenhuma notificação ainda.</p>';return;}
+    el.innerHTML=notifLog[type].map(l=>{
+      const tag=type==='lib'?'<span class="ntag tl">LIBERADO</span>':'<span class="ntag tp">PENDENTE</span>';
+      return`<div class="nl"><span class="ni">${type==='lib'?'✅':'⏳'}</span><span class="nt">${tag}${l.msg}</span><span class="nd">${new Date(l.date).toLocaleString('pt-BR')}</span></div>`;
+    }).join('');
+  });
+}
+
+/* ═══ VERIFICAÇÃO PERIÓDICA ═══ */
+// Roda a cada 4 horas enquanto a página estiver aberta
+setInterval(()=>{if(isBusinessDay())checkPendNotif();},4*60*60*1000);
+
+/* ═══ INIT ═══ */
+loadCfg();
+loadAll();
+</script>
 </body>
 </html>
