@@ -211,7 +211,7 @@ tbody tr:hover{background:#fff5f5}
     <div class="fg"><label>Filtrar Status</label><select id="f-xs" onchange="renderAcessos()"><option value="">Todos</option><option value="liberado">Liberado</option><option value="pendente">Pendente</option><option value="em_validacao">Em Validação</option></select></div>
     <div class="fg"><label>Buscar</label><input id="f-xb" placeholder="Analista ou Cliente..." oninput="renderAcessos()"></div>
   </div>
-  <div class="tw"><table><thead><tr><th>ID</th><th>Torre</th><th>Analista</th><th>Cliente</th><th>Status</th><th>Obs</th><th>Atualizado</th><th>Ações</th></tr></thead><tbody id="xtb"></tbody></table></div>
+  <div class="tw"><table><thead><tr><th>ID</th><th>Torre</th><th>Analista</th><th>Cliente</th><th>Status</th><th>Observacao</th><th>Atualizado</th><th>Ações</th></tr></thead><tbody id="xtb"></tbody></table></div>
 </div>
 
 <!-- NOTIFICAÇÕES -->
@@ -250,7 +250,7 @@ tbody tr:hover{background:#fff5f5}
 /* ═══════════════════════════════════════
    CONFIG SUPABASE + EMAILJS
    ═══════════════════════════════════════ */
-const SB='https://mwwlimmkiphwdeleewzd.supabase.co';
+const SB='https://mwwlimmkiphwdeleewzd.supabase.co/rest/v1';
 const AK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13d2xpbW1raXBod2RlbGVld3pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3ODIwNTcsImV4cCI6MjEwMzM1ODA1N30.HKGRI3toztOUThxXnIXFqFcKnjPPi4c1WzYq-2tz3Zc';
 const HD={'apikey':AK,'Authorization':'Bearer '+AK,'Content-Type':'application/json','Prefer':'return=representation'};
 
@@ -501,7 +501,7 @@ function renderAcessos() {
       <td>${aNome(a.analista_id)}</td>
       <td>${cNome(a.cliente_id)}</td>
       <td>${stb[a.status] || a.status}</td>
-      <td>${a.obs || '-'}</td>  <!-- ← USE "obs" aqui -->
+      <td>${a.observacao || '-'}</td>  <!-- ← USE "obs" aqui -->
       <td>${new Date(a.updated_at).toLocaleString('pt-BR')}</td>
       <td>
         <button class="bs bdo" onclick="editAcesso(${a.id})">Editar</button>
@@ -520,7 +520,7 @@ function editAcesso(id) {
   document.getElementById('i-xa').value = a.analista_id || '';
   document.getElementById('i-xc').value = a.cliente_id || '';
   document.getElementById('i-xs').value = a.status || 'pendente';
-  document.getElementById('i-xo').value = a.obs || '';  // ← USE "obs" aqui
+  document.getElementById('i-xo').value = a.observacao || '';  // ← USE "obs" aqui
 
   // Muda o botão para "Atualizar"
   const btn = document.querySelector('#pg-acessos .btn.bp');
@@ -579,7 +579,7 @@ async function addAcesso() {
         analista_id: Number(a),
         cliente_id: Number(c),
         status: s,
-        obs: o  // ← USE "obs" aqui
+        observacao: o  // ← USE "observacao" aqui
       })
     });
     toast('Acesso registrado!');
