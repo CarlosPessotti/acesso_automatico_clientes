@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Acesso</title>
+    <style>
+        :root {
+            --primary-red: #BF0411;
+            --darker-red: #C00000;
+            --light-gray: #E9E9E9;
+            --medium-gray: #CBCBCB;
+            --text-color: #333;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--white);
+            padding: 30px 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            color: var(--primary-red);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-red);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--primary-red);
+            color: var(--white);
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--darker-red);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Cadastro de Acesso</h1>
+        <form id="access-form">
+            <div class="form-group">
+                <label for="access-type">Tipo de Acesso</label>
+                <select id="access-type" name="access-type" required>
+                    <option value="ssh">SSH</option>
+                    <option value="rdp">RDP</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="access-name">Nome do Acesso</label>
+                <input type="text" id="access-name" name="access-name" placeholder="Ex: Servidor Principal" required>
+            </div>
+            <div class="form-group">
+                <label for="host">Host (IP ou Domínio)</label>
+                <input type="text" id="host" name="host" placeholder="192.168.1.100" required>
+            </div>
+            <div class="form-group">
+                <label for="port">Porta</label>
+                <input type="number" id="port" name="port" placeholder="22" required>
+            </div>
+            <div class="form-group">
+                <label for="username">Usuário</label>
+                <input type="text" id="username" name="username" placeholder="admin" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Senha ou Chave</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Salvar Acesso</button>
+        </form>
+    </div>
+
+</body>
+</html>
