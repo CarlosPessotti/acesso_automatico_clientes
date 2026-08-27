@@ -610,42 +610,53 @@ function delAcesso(id){
 /* ═══════════════════════════════════════
    NOTIFICAÇÕES POR EMAIL
    ═══════════════════════════════════════ */
-function sendNotif(status,info){
-  const cfg=JSON.parse(localStorage.getItem('notifCfg')||'{"lib":true,"pend":true,"int":15}');
-  if(status==='liberado'&&!cfg.lib)return;
-  if(status==='pendente'&&!cfg.pend)return;
-
-  const tpl=status==='liberado'?EJS_TPL_LIB:EJS_TPL_PEND;
-  const params={
-    analista:info.analista,
-    cliente:info.cliente,
-    torre:info.torre,
-    status:status,
-    data:new Date().toLocaleString('pt-BR')
+function logNotif(tipo, analista, cliente, torre){
+  const log=JSON.parse(localStorage.getItem('notifLog')||'{"lib":[],"pend":[]}');
+  const entry={
+    msg: analista+' → '+cliente+' ('+torre+')',
+    dt: new Date().toLocaleString('pt-BR')
   };
-
-  emailjs.send(EJS_SVC,tpl,params).then(()=>{
-    const log={txt:`${info.analista} → ${info.cliente} (${info.torre})`,dt:new Date().toLocaleString('pt-BR')};
-    if(status==='liberado') notifLog.lib.unshift(log);
-    else notifLog.pend.unshift(log);
-    notifLog.lib=notifLog.lib.slice(0,50);
-    notifLog.pend=notifLog.pend.slice(0,50);
-    localStorage.setItem('notifLog',JSON.stringify(notifLog));
-    toast('Notificação enviada!');
-  }).catch(e=>{
-    console.error('EmailJS erro:',e);
-  });
+  if(tipo==='liberado'){
+    log.lib.unshift(entry);
+    log.lib=log.lib.slice(0,50); // mantém últimos 50
+  }else{
+    log.pend.unshift(entry);
+    log.pend=log.pend.slice(0,50);
+  }
+  localStorage.setItem('notifLog',JSON.stringify(log));
 }
 
 function renderNotifLogs(){
-  const lLib=document.getElementById('log-lib');
-  const lPend=document.getElementById('log-pend');
-  if(lLib) lLib.innerHTML=notifLog.lib.map(n=>
-    `<div class="nl"><span class="ni">✅</span><div class="nt"><span class="ntag tl">Liberado</span>${n.txt}</div><div class="nd">${n.dt}</div></div>`
-  ).join('')||'<p style="text-align:center;color:#999;padding:2rem">Nenhum envio registrado.</p>';
-  if(lPend) lPend.innerHTML=notifLog.pend.map(n=>
-    `<div class="nl"><span class="ni">⚠️</span><div class="nt"><span class="ntag tp">Pendente</span>${n.txt}</div><div class="nd">${n.dt}</div></div>`
-  ).join('')||'<p style="text-align:center;color:#999;padding:2rem">Nenhum envio registrado.</p>';
+  const log=JSON.parse(localStorage.getItem('notifLog')||'{"lib":[],"pend":[]}');
+
+  // Renderiza Liberados
+  const libEl=document.getElementById('nlog-lib');
+  if(libEl){
+    libEl.innerHTML=log.lib.length? log.lib.map(e=>{
+      // Compatível com formato antigo E novo
+      const txt=e.msg || (e.analista? e.analista+' → '+e.cliente+' ('+e.torre+')' : 'Registro sem detalhes');
+      const dt=e.dt || e.data || '';
+      return `<div class="nl">
+        <div class="ni">✅</div>
+        <div class="nt"><span class="ntag tl">Liberado</span>${txt}</div>
+        <div class="nd">${dt}</div>
+      </div>`;
+    }).join(''):'<div style="text-align:center;color:#999;padding:1rem">Nenhum envio registrado.</div>';
+  }
+
+  // Renderiza Pendentes
+  const pendEl=document.getElementById('nlog-pend');
+  if(pendEl){
+    pendEl.innerHTML=log.pend.length? log.pend.map(e=>{
+      const txt=e.msg || (e.analista? e.analista+' → '+e.cliente+' ('+e.torre+')' : 'Registro sem detalhes');
+      const dt=e.dt || e.data || '';
+      return `<div class="nl">
+        <div class="ni">⚠️</div>
+        <div class="nt"><span class="ntag tp">Pendente</span>${txt}</div>
+        <div class="nd">${dt}</div>
+      </div>`;
+    }).join(''):'<div style="text-align:center;color:#999;padding:1rem">Nenhum envio registrado.</div>';
+  }
 }
 
 function saveCfg(){
