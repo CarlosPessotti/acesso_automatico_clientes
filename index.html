@@ -590,7 +590,12 @@ async function addAcesso(){
     await sf('/acessos',{method:'POST',body:JSON.stringify({torre_id:t,analista_id:a,cliente_id:c,status:s,observacao:o})});
     toast('Acesso registrado!');
     ['i-xt','i-xa','i-xc','i-xo'].forEach(id=>document.getElementById(id).value='');
-    sendNotifEmail(s,{analista:aNome(a),cliente:cNome(c),torre:tNome(t)});
+    sendNotifEmail(s, {
+  analista: aNome(a),
+  cliente: cNome(c),
+  torre: tNome(t),
+  observacao: o
+});
     await loadAll();
   }catch(e){toast('Erro: '+e.message,'er');}
 }
@@ -666,17 +671,54 @@ function renderNotifLogs(){
     }).join(''):'<div style="text-align:center;color:#999;padding:1rem">Nenhum envio registrado.</div>';
   }
 }
-async function sendNotifEmail(tipo,dados){
-  const cfg=JSON.parse(localStorage.getItem('notifCfg')||'{}');
-  if((tipo==='liberado'&&cfg.lib===false)||(tipo==='pendente'&&cfg.pend===false)) return;
-  if(!dentroDoPeriodo()){console.log('Fora do período de envio, notificação ignorada');return;}
-  const tpl=tipo==='liberado'?EJS_TPL_LIB:EJS_TPL_PEND;
-  try{
-    await emailjs.send(EJS_SVC,tpl,{analista:dados.analista||'N/A',cliente:dados.cliente||'N/A',torre:dados.torre||'N/A',status:tipo,link:'https://carlospessotti.github.io/acesso_automatico_clientes/'});
-    logNotif(tipo,dados.analista,dados.cliente,dados.torre);
+async function sendNotifEmail(tipo, dados){
+  const cfg = JSON.parse(localStorage.getItem('notifCfg') || '{}');
+  if ((tipo === 'liberado' && cfg.lib === false) || (tipo === 'pendente' && cfg.pend === false)) return;
+  if (!dentroDoPeriodo()) { console.log('Fora do período de envio'); return; }
+
+  const tpl = tipo === 'liberado' ? EJS_TPL_LIB : EJS_TPL_PEND;
+
+  // Calcula estatísticas da torre para o template liberado
+  const torreId = torres.find(t => t.nome === dados.torre)?.id;
+  const libCount = acessos.filter(a => a.torre_id === torreId && a.status === 'liberado').length;
+  const pendCount = acessos.filter(a => a.torre_id === torreId && a.status === 'pendente').length;
+  const total = libCount + pendCount;
+  const perc = total > 0 ? ((libCount / total) * 100).toFixed(1) : '0';
+
+  let params;
+
+  if (tipo === 'liberado') {
+    params = {
+      torre:       dados.torre || 'N/A',
+      analista:    dados.analista || 'N/A',
+      cliente:     dados.cliente || 'N/A',
+      data:        new Date().toLocaleDateString('pt-BR'),
+      observacao:  dados.observacao || 'Sem observações',
+      liberados:   String(libCount),
+      pendentes:   String(pendCount),
+      percentual:  perc
+    };
+  } else {
+    params = {
+      torre:       dados.torre || 'N/A',
+      analista:    dados.analista || 'N/A',
+      cliente:     dados.cliente || 'N/A',
+      dias:        dados.dias || '0',
+      data_inicio: dados.data_inicio || new Date().toLocaleDateString('pt-BR'),
+      observacao:  dados.observacao || 'Sem observações'
+    };
+  }
+
+  try {
+    await emailjs.send(EJS_SVC, tpl, params);
+    logNotif(tipo, dados.analista, dados.cliente, dados.torre);
     toast('📧 Notificação enviada!');
-  }catch(e){console.error('Erro EmailJS:',e);toast('Erro ao enviar notificação','er');}
+  } catch(e) {
+    console.error('Erro EmailJS:', e);
+    toast('Erro ao enviar notificação', 'er');
+  }
 }
+
 function checkPendNotif(){
   const cfg=JSON.parse(localStorage.getItem('notifCfg')||'{}');
   if(cfg.pend===false||!dentroDoPeriodo()) return;
