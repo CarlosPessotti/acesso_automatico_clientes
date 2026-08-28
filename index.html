@@ -308,8 +308,8 @@ const HD={'apikey':AK,'Authorization':'Bearer '+AK,'Content-Type':'application/j
 
 const EJS_PK='iU9eUIjC9pv_1RRco';
 const EJS_SVC='service_torres';
-const EJS_TPL_LIB='template_q4gxt1j';
-const EJS_TPL_PEND='template_0j7i0i7';
+const EJS_TPL_LIB='acesso_liberado_service';
+const EJS_TPL_PEND='acesso_pendente_service';
 emailjs.init(EJS_PK);
 
 let torres=[],analistas=[],clientes=[],acessos=[],logins=[];
@@ -567,7 +567,7 @@ function renderAcessos(){
     .map(a=>`<tr>
       <td>${a.id}</td><td>${aNome(a.analista_id)}</td><td>${cNome(a.cliente_id)}</td><td>${tNome(a.torre_id)}</td>
       <td><span class="bd ${a.status==='liberado'?'bg':(a.status==='pendente'?'bo':'br')}">${a.status}</span></td>
-      <td>${formatDate(a.created_at)}</td><td>${a.obs||'-'}</td>
+      <td>${formatDate(a.created_at)}</td><td>${a.observacao||'-'}</td>
       <td><button class="bs bdr" onclick="deleteAcesso(${a.id})">Excluir</button></td>
      </tr>`).join('');
   document.getElementById('xtb').innerHTML=data;
@@ -587,7 +587,7 @@ async function addAcesso(){
   const o=document.getElementById('i-xo').value.trim();
   if(!t||!a||!c){toast('Preencha torre, analista e cliente','er');return;}
   try{
-    await sf('/acessos',{method:'POST',body:JSON.stringify({torre_id:t,analista_id:a,cliente_id:c,status:s,obs:o})});
+    await sf('/acessos',{method:'POST',body:JSON.stringify({torre_id:t,analista_id:a,cliente_id:c,status:s,observacao:o})});
     toast('Acesso registrado!');
     ['i-xt','i-xa','i-xc','i-xo'].forEach(id=>document.getElementById(id).value='');
     sendNotifEmail(s,{analista:aNome(a),cliente:cNome(c),torre:tNome(t)});
