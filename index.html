@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -23,7 +24,7 @@ body{font-family:var(--f);background:var(--gl);color:var(--d);min-height:100vh;p
 .wrap{max-width:1440px;margin:0 auto;padding:1.5rem}
 .pg{display:none}.pg.act{display:block}
 
-.kr{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:1rem;margin-bottom:1.5rem}
+.kr{display:grid;grid-template-columns:repeat(auto-fit,minminmax(185px,1fr));gap:1rem;margin-bottom:1.5rem}
 .kc{background:var(--w);border-radius:12px;padding:1.1rem;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid var(--red)}
 .kc .n{font-size:2rem;font-weight:800;color:var(--red)}.kc .l{font-size:.76rem;color:#666;margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
 .kc.g{border-left-color:var(--grn)}.kc.g .n{color:var(--grn)}
@@ -175,91 +176,121 @@ tbody tr.editing-row{background:#fff8e1 !important}
 
 <!-- ANALISTAS -->
 <div class="pg" id="pg-analistas">
-  <div class="fc"><h3>➕ Cadastrar Analista</h3>
+  <div class="fc" id="an-form-card"><h3>➕ Cadastrar Analista</h3>
     <div class="fr">
       <div class="fg"><label>Nome</label><input id="i-an" placeholder="Ex: João Silva"></div>
       <div class="fg"><label>Torre</label><select id="i-at"><option value="">Selecione...</option></select></div>
-      <div class="fg" style="justify-content:flex-end"><button class="btn bp" onclick="addAnalista()">Cadastrar</button></div>
     </div>
-  </div>
-  <div class="export-bar">
-    <button onclick="exportTable('analistas-table','csv')">📄 CSV</button>
-    <button onclick="exportTable('analistas-table','xlsx')">📊 Excel</button>
-    <button onclick="exportTable('analistas-table','txt')">📝 TXT</button>
-    <button onclick="exportTable('analistas-table','pdf')">📕 PDF</button>
+    <div id="an-form-buttons">
+      <button class="btn bp" onclick="addAnalista()">➕ Cadastrar</button>
+    </div>
   </div>
   <div class="fb">
     <div class="fg"><label>Filtrar Torre</label><select id="f-at" onchange="renderAnalistas()"><option value="">Todas</option></select></div>
     <div class="fg"><label>Buscar</label><input id="f-an" placeholder="Nome..." oninput="renderAnalistas()"></div>
   </div>
-  <div class="tw"><table id="analistas-table"><thead><tr><th>ID</th><th>Nome</th><th>Torre</th><th>Contratos</th><th>Ações</th></tr></thead><tbody id="atb"></tbody></table></div>
+  <div class="tw"><h3>👤 Lista de Analistas</h3>
+    <table>
+      <thead><tr><th>ID</th><th>Nome</th><th>Torre</th><th>Contratos na Torre</th><th>Ações</th></tr></thead>
+      <tbody id="atb"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- CLIENTES -->
+<div class="pg" id="pg-clientes">
+  <div class="fc" id="cl-form-card"><h3>➕ Cadastrar Cliente</h3>
+    <div class="fr">
+      <div class="fg"><label>Nome</label><input id="i-cn" placeholder="Ex: Empresa X"></div>
+      <div class="fg"><label>Torre</label><select id="i-ct"><option value="">Selecione...</option></select></div>
+    </div>
+    <div id="cl-form-buttons">
+      <button class="btn bp" onclick="addCliente()">➕ Cadastrar</button>
+    </div>
+  </div>
+  <div class="fb">
+    <div class="fg"><label>Filtrar Torre</label><select id="f-ct" onchange="renderClientes()"><option value="">Todas</option></select></div>
+    <div class="fg"><label>Buscar</label><input id="f-cn" placeholder="Nome..." oninput="renderClientes()"></div>
+  </div>
+  <div class="tw"><h3>🏢 Lista de Clientes</h3>
+    <table>
+      <thead><tr><th>ID</th><th>Nome</th><th>Torre</th><th>Ações</th></tr></thead>
+      <tbody id="ctb"></tbody>
+    </table>
+  </div>
 </div>
 
 <!-- ACESSOS -->
 <div class="pg" id="pg-acessos">
-  <div class="fc"><h3>➕ Registrar Acesso</h3>
+  <div class="fc" id="ac-form-card"><h3>➕ Registrar Acesso</h3>
     <div class="fr">
       <div class="fg"><label>Torre</label><select id="i-xt" onchange="onAcessoTorreChange()"><option value="">Selecione...</option></select></div>
-      <div class="fg"><label>Analista</label><select id="i-xa"><option value="">Selecione torre</option></select></div>
-      <div class="fg"><label>Cliente</label><select id="i-xc"><option value="">Selecione torre</option></select></div>
+      <div class="fg"><label>Analista</label><select id="i-xa"><option value="">Selecione a torre primeiro</option></select></div>
+      <div class="fg"><label>Cliente</label><select id="i-xc"><option value="">Selecione a torre primeiro</option></select></div>
       <div class="fg"><label>Status</label><select id="i-xs"><option value="liberado">Liberado</option><option value="pendente">Pendente</option></select></div>
     </div>
-    <div class="fr">
-      <div class="fg"><label>Observações</label><textarea id="i-xo" placeholder="Detalhes sobre o acesso..."></textarea></div>
-      <div class="fg" style="justify-content:flex-end;align-items:flex-end"><button class="btn bp" onclick="addAcesso()">Registrar</button></div>
+    <div class="fg"><label>Observações</label><textarea id="i-xo" placeholder="Detalhes sobre o acesso..."></textarea></div>
+    <div id="ac-form-buttons">
+      <button class="btn bp" onclick="addAcesso()">➕ Registrar</button>
     </div>
-  </div>
-  <div class="export-bar">
-    <button onclick="exportTable('acessos-table','csv')">📄 CSV</button>
-    <button onclick="exportTable('acessos-table','xlsx')">📊 Excel</button>
-    <button onclick="exportTable('acessos-table','txt')">📝 TXT</button>
-    <button onclick="exportTable('acessos-table','pdf')">📕 PDF</button>
   </div>
   <div class="fb">
     <div class="fg"><label>Filtrar Torre</label><select id="f-xt" onchange="renderAcessos()"><option value="">Todas</option></select></div>
     <div class="fg"><label>Filtrar Status</label><select id="f-xs" onchange="renderAcessos()"><option value="">Todos</option><option value="liberado">Liberado</option><option value="pendente">Pendente</option></select></div>
     <div class="fg"><label>Buscar</label><input id="f-x" placeholder="Analista ou Cliente..." oninput="renderAcessos()"></div>
   </div>
-  <div class="tw"><table id="acessos-table"><thead><tr><th>ID</th><th>Analista</th><th>Cliente</th><th>Torre</th><th>Status</th><th>Data</th><th>Observações</th><th>Ações</th></tr></thead><tbody id="xtb"></tbody></table></div>
-</div>
-
-<!-- CLIENTES -->
-<div class="pg" id="pg-clientes">
-  <div class="fc"><h3>➕ Cadastrar Cliente</h3>
-    <div class="fr">
-      <div class="fg"><label>Nome</label><input id="i-cn" placeholder="Ex: Empresa Exemplo"></div>
-      <div class="fg"><label>Torre</label><select id="i-ct"><option value="">Selecione...</option></select></div>
-      <div class="fg" style="justify-content:flex-end"><button class="btn bp" onclick="addCliente()">Cadastrar</button></div>
-    </div>
+  <div class="tw"><h3>🔑 Lista de Acessos</h3>
+    <table>
+      <thead><tr><th>ID</th><th>Analista</th><th>Cliente</th><th>Torre</th><th>Status</th><th>Data</th><th>Observação</th><th>Ações</th></tr></thead>
+      <tbody id="xtb"></tbody>
+    </table>
   </div>
-  <div class="export-bar">
-    <button onclick="exportTable('clientes-table','csv')">📄 CSV</button>
-    <button onclick="exportTable('clientes-table','xlsx')">📊 Excel</button>
-    <button onclick="exportTable('clientes-table','txt')">📝 TXT</button>
-    <button onclick="exportTable('clientes-table','pdf')">📕 PDF</button>
-  </div>
-  <div class="fb">
-    <div class="fg"><label>Filtrar Torre</label><select id="f-ct" onchange="renderClientes()"><option value="">Todas</option></select></div>
-    <div class="fg"><label>Buscar</label><input id="f-cn" placeholder="Nome..." oninput="renderClientes()"></div>
-  </div>
-  <div class="tw"><table id="clientes-table"><thead><tr><th>ID</th><th>Nome</th><th>Torre</th><th>Ações</th></tr></thead><tbody id="ctb"></tbody></table></div>
 </div>
 
 <!-- NOTIFICAÇÕES -->
 <div class="pg" id="pg-notificacoes">
-  <div class="notif-card cfg"><h3>⚙️ Configurações de Notificação</h3>
-    <div class="cfg-row"><label>Notificar quando acesso for liberado</label><label class="toggle"><input type="checkbox" id="cfg-lib" checked><span class="slider"></span></label></div>
-    <div class="cfg-row"><label>Notificar quando houver pendências</label><label class="toggle"><input type="checkbox" id="cfg-pend" checked><span class="slider"></span></label></div>
-    <div class="cfg-row"><label>Intervalo de verificação (minutos)</label><input type="number" id="cfg-intervalo" value="15" min="1" max="1440" style="width:80px"></div>
-    <div class="cfg-row"><label>Período de envio</label>
-      <select id="cfg-periodo" style="padding:6px 10px;border:1.5px solid var(--gm);border-radius:6px;font-size:.85rem;width:200px">
-        <option value="sempre">Sempre (24h)</option><option value="comercial" selected>Horário comercial (8h–18h)</option><option value="manha">Apenas manhã (8h–12h)</option><option value="tarde">Apenas tarde (12h–18h)</option><option value="noturno">Noturno (18h–23h)</option>
+  <div class="notif-card cfg">
+    <h3>⚙️ Configurações de Notificação</h3>
+    <div class="cfg-row">
+      <label>Enviar notificação para Acesso Liberado</label>
+      <label class="toggle"><input type="checkbox" id="cfg-lib" checked><span class="slider"></span></label>
+    </div>
+    <div class="cfg-row">
+      <label>Enviar notificação para Acesso Pendente</label>
+      <label class="toggle"><input type="checkbox" id="cfg-pend" checked><span class="slider"></span></label>
+    </div>
+    <div class="cfg-row">
+      <label>E-mail de destino (analista/gestor)</label>
+      <input type="email" id="cfg-email" placeholder="email@exemplo.com">
+    </div>
+    <div class="cfg-row">
+      <label>Verificar a cada (minutos)</label>
+      <input type="number" id="cfg-intervalo" value="15" min="1">
+    </div>
+    <div class="cfg-row">
+      <label>Período de envio</label>
+      <select id="cfg-periodo">
+        <option value="sempre">Sempre (24h)</option>
+        <option value="comercial">Horário comercial (8h–18h)</option>
+        <option value="manha">Apenas manhã (8h–12h)</option>
+        <option value="tarde">Apenas tarde (12h–18h)</option>
       </select>
     </div>
-    <div style="margin-top:1rem"><button class="btn bp" onclick="saveNotifCfg()">💾 Salvar Configurações</button></div>
+    <div style="margin-top:1rem">
+      <button class="btn bp" onclick="saveNotifCfg()">💾 Salvar Configurações</button>
+      <button class="btn bc" onclick="testNotif()">🧪 Testar Envio</button>
+    </div>
   </div>
-  <div class="notif-card lib"><h3>✅ Acessos Liberados (Últimos Envios)</h3><div class="nlog" id="nlog-lib"><div style="text-align:center;color:#999;padding:1rem">Nenhum envio registrado.</div></div></div>
-  <div class="notif-card pend"><h3>⚠️ Pendências Notificadas (Últimos Envios)</h3><div class="nlog" id="nlog-pend"><div style="text-align:center;color:#999;padding:1rem">Nenhum envio registrado.</div></div></div>
+  <div class="cg">
+    <div class="notif-card lib">
+      <h3>📨 Lembretes "Liberado" (Histórico)</h3>
+      <div class="nlog" id="nlog-lib"></div>
+    </div>
+    <div class="notif-card pend">
+      <h3>📨 Lembretes "Pendente" (Histórico)</h3>
+      <div class="nlog" id="nlog-pend"></div>
+    </div>
+  </div>
 </div>
 
 <!-- ÚLTIMO LOGIN -->
@@ -273,24 +304,56 @@ tbody tr.editing-row{background:#fff8e1 !important}
   <div class="fc" id="l-form-card">
     <h3 id="l-form-title">🕐 Registrar Último Login</h3>
     <div class="fr">
-      <div class="fg"><label>Torre</label><select id="l-i-torre" onchange="onLoginTorreChange()"><option value="">Selecione...</option></select></div>
-      <div class="fg"><label>Analista</label><select id="l-i-analista"><option value="">Selecione a torre</option></select></div>
-      <div class="fg"><label>Cliente</label><select id="l-i-cliente"><option value="">Selecione a torre</option></select></div>
-      <div class="fg"><label>Data/Hora do Login</label><input type="datetime-local" id="l-i-datahora"></div>
+      <div class="fg">
+        <label>Torre</label>
+        <select id="l-i-torre" onchange="onLoginTorreChange()"><option value="">Selecione...</option></select>
+      </div>
+      <div class="fg">
+        <label>Analista</label>
+        <select id="l-i-analista"><option value="">Selecione a torre primeiro</option></select>
+      </div>
+      <div class="fg">
+        <label>Cliente</label>
+        <select id="l-i-cliente"><option value="">Selecione a torre primeiro</option></select>
+      </div>
+      <div class="fg">
+        <label>Data/Hora do Login</label>
+        <input type="datetime-local" id="l-i-datahora">
+      </div>
     </div>
-    <div id="l-form-buttons"><button class="btn bp" id="l-btn-submit" onclick="registrarLogin()">📌 Registrar Login</button></div>
+    <div id="l-form-buttons">
+      <button class="btn bp" onclick="registrarLogin()">📌 Registrar Login</button>
+    </div>
   </div>
   <div class="fb">
     <div class="fg"><label>Filtrar Torre</label><select id="l-f-torre" onchange="renderLogins()"><option value="">Todas</option></select></div>
     <div class="fg"><label>Filtrar Criticidade</label>
       <select id="l-f-crit" onchange="renderLogins()">
-        <option value="">Todas</option><option value="crit">🔴 Crítico (&gt;10d)</option><option value="warn">🟡 Atenção (5-10d)</option><option value="ok">🟢 OK (&lt;5d)</option>
+        <option value="">Todas</option>
+        <option value="crit">🔴 Crítico (&gt;10d)</option>
+        <option value="warn">🟡 Atenção (5-10d)</option>
+        <option value="ok">🟢 OK (&lt;5d)</option>
       </select>
     </div>
     <div class="fg"><label>Buscar</label><input id="l-f-busca" placeholder="Analista ou Cliente..." oninput="renderLogins()"></div>
   </div>
-  <div class="tw"><h3>📋 Ranking de Último Login (mais crítico primeiro)</h3>
-    <table><thead><tr><th>#</th><th>Criticidade</th><th>Dias sem login</th><th>Torre</th><th>Analista</th><th>Cliente</th><th>Último Login</th><th>Ações</th></tr></thead><tbody id="ltb"></tbody></table>
+  <div class="tw">
+    <h3>📋 Ranking de Último Login (mais crítico primeiro)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Criticidade</th>
+          <th>Dias sem login</th>
+          <th>Torre</th>
+          <th>Analista</th>
+          <th>Cliente</th>
+          <th>Último Login</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="ltb"></tbody>
+    </table>
   </div>
 </div>
 
@@ -315,7 +378,13 @@ emailjs.init(EJS_PK);
 let torres=[],analistas=[],clientes=[],acessos=[],logins=[];
 let charts={c1:null,c2:null,c3:null,c4:null};
 let modalCb=null;
-let editingId=null;
+
+// Variáveis para controle de edição em cada página
+let editingAnalistaId = null;
+let editingClienteId = null;
+let editingAcessoId = null;
+let editingLoginId = null;
+
 
 /* ═══════════════════════════════════════
    FUNÇÕES DE UI (TOAST, MODAL, NAVEGAÇÃO)
@@ -352,6 +421,12 @@ function go(el){
   el.classList.add('act');
   if(el.dataset.p==='dashboard')renderAllCharts();
   if(el.dataset.p==='notificacoes')renderNotifLogs();
+  if(el.dataset.p==='ultimo-login')renderLogins(); // Para garantir que a tabela seja renderizada ao entrar na página
+  // Chamar cancelamento de edição ao mudar de página para evitar estados inconsistentes
+  cancelEditAnalista();
+  cancelEditCliente();
+  cancelEditAcesso();
+  cancelEditLogin();
 }
 
 /* ═══════════════════════════════════════
@@ -462,26 +537,26 @@ function renderAllCharts(){
     const anContratos=clientes.filter(cl=>cl.torre_id===an.torre_id).length;
     return{nome:an.nome.split(' ')[0],liberados:anAcessos,contratos:anContratos};
   }).sort((a,b)=>b.liberados-a.liberados).slice(0,10);
-  charts.c1=new Chart(document.getElementById('c1'),{type:'bar',data:{labels:analistasData.map(d=>d.nome),datasets:[{label:'Liberados',data:analistasData.map(d=>d.liberados),backgroundColor:'#2ecc71'},{label:'Contratos na Torre',data:analistasData.map(d=>d.contratos),backgroundColor:'rgba(0,0,0,0.1)'}]}});
+  charts.c1=new Chart(document.getElementById('c1'),{type:'bar',data:{labels:analistasData.map(d=>d.nome),datasets:[{label:'Liberados',data:analistasData.map(d=>d.liberados),backgroundColor:'#2ecc71'},{label:'Contratos na Torre',data:analistasData.map(d=>d.contratos),backgroundColor:'rgba(0,0,0,0.1)'}]}, options: {responsive: true, maintainAspectRatio: false}});
 
   const pendPorTorre=torres.map(t=>{
     const pends=acessos.filter(a=>a.torre_id===t.id&&a.status==='pendente').length;
     return {torre:t.nome,pends};
   });
-  charts.c2=new Chart(document.getElementById('c2'),{type:'doughnut',data:{labels:pendPorTorre.map(d=>d.torre),datasets:[{data:pendPorTorre.map(d=>d.pends),backgroundColor:['#BF0411','#C00000','#e74c3c','#d35400','#f39c12','#f1c40f','#7f8c8d','#95a5a6','#bdc3c7']}]},options:{plugins:{legend:{position:'right'}}}});
+  charts.c2=new Chart(document.getElementById('c2'),{type:'doughnut',data:{labels:pendPorTorre.map(d=>d.torre),datasets:[{data:pendPorTorre.map(d=>d.pends),backgroundColor:['#BF0411','#C00000','#e74c3c','#d35400','#f39c12','#f1c40f','#7f8c8d','#95a5a6','#bdc3c7']}]},options:{plugins:{legend:{position:'right'}}, responsive: true, maintainAspectRatio: false}});
 
   const libPercPorTorre=torres.map(t=>{
     const li=acessos.filter(a=>a.torre_id===t.id&&a.status==='liberado').length;
     const pe=acessos.filter(a=>a.torre_id===t.id&&a.status==='pendente').length;
     return li+pe>0?(li/(li+pe))*100:0;
   });
-  charts.c3=new Chart(document.getElementById('c3'),{type:'bar',data:{labels:torres.map(t=>t.nome),datasets:[{label:'% Liberados',data:libPercPorTorre,backgroundColor:'#27ae60'}]},options:{indexAxis:'y',scales:{x:{max:100}}}});
+  charts.c3=new Chart(document.getElementById('c3'),{type:'bar',data:{labels:torres.map(t=>t.nome),datasets:[{label:'% Liberados',data:libPercPorTorre,backgroundColor:'#27ae60'}]},options:{indexAxis:'y',scales:{x:{max:100}}, responsive: true, maintainAspectRatio: false}});
 
   const pendPorCliente=clientes.map(c=>{
     const pends=acessos.filter(a=>a.cliente_id===c.id&&a.status==='pendente').length;
     return {cliente:c.nome,pends};
   }).filter(d=>d.pends>0).sort((a,b)=>b.pends-a.pends).slice(0,10);
-  charts.c4=new Chart(document.getElementById('c4'),{type:'bar',data:{labels:pendPorCliente.map(d=>d.cliente),datasets:[{label:'Pendências',data:pendPorCliente.map(d=>d.pends),backgroundColor:'#e67e22'}]},options:{indexAxis:'y'}});
+  charts.c4=new Chart(document.getElementById('c4'),{type:'bar',data:{labels:pendPorCliente.map(d=>d.cliente),datasets:[{label:'Pendências',data:pendPorCliente.map(d=>d.pends),backgroundColor:'#e67e22'}]},options:{indexAxis:'y'}, responsive: true, maintainAspectRatio: false});
 }
 
 /* ═══════════════════════════════════════
@@ -492,24 +567,34 @@ function renderAnalistas(){
   const fNome=document.getElementById('f-an').value.toLowerCase();
   const data=analistas
     .filter(a=>(!fTorre||a.torre_id==fTorre)&&(!fNome||a.nome.toLowerCase().includes(fNome)))
-    .map(a=>`<tr>
+    .map(a=>`<tr id="analista-row-${a.id}" class="${editingAnalistaId===a.id?'editing-row':''}">
       <td>${a.id}</td><td>${a.nome}</td><td>${tNome(a.torre_id)}</td>
       <td>${clientes.filter(c=>c.torre_id===a.torre_id).length}</td>
-      <td><button class="bs bdr" onclick="deleteAnalista(${a.id},'${a.nome}')">Excluir</button></td>
+      <td>
+        <button class="bs bdo" onclick="editAnalista(${a.id})">Editar</button>
+        <button class="bs bdr" onclick="deleteAnalista(${a.id},'${a.nome}')">Excluir</button>
+      </td>
      </tr>`).join('');
   document.getElementById('atb').innerHTML=data;
 }
+
 async function addAnalista(){
   const nome=document.getElementById('i-an').value.trim();
   const torre_id=document.getElementById('i-at').value;
   if(!nome||!torre_id){toast('Preencha nome e torre','er');return;}
   try{
-    await sf('/analistas',{method:'POST',body:JSON.stringify({nome,torre_id})});
-    toast('Analista cadastrado!');
-    document.getElementById('i-an').value='';
+    if(editingAnalistaId){
+      await sf(`/analistas?id=eq.${editingAnalistaId}`,{method:'PATCH',body:JSON.stringify({nome,torre_id: Number(torre_id)})});
+      toast('Analista atualizado!');
+    } else {
+      await sf('/analistas',{method:'POST',body:JSON.stringify({nome,torre_id: Number(torre_id)})});
+      toast('Analista cadastrado!');
+    }
+    cancelEditAnalista();
     await loadAll();
   }catch(e){toast('Erro: '+e.message,'er');}
 }
+
 async function deleteAnalista(id,nome){
   modalShow('Excluir Analista',`Deseja realmente excluir ${nome}? Isso também removerá seus acessos registrados.`,async()=>{
     try{
@@ -520,6 +605,38 @@ async function deleteAnalista(id,nome){
   });
 }
 
+function editAnalista(id){
+  cancelEditAnalista(); // Limpa qualquer edição anterior
+  editingAnalistaId = id;
+  const analista = analistas.find(a => a.id === id);
+  if (!analista) return;
+
+  document.getElementById('i-an').value = analista.nome;
+  document.getElementById('i-at').value = analista.torre_id;
+
+  document.getElementById('an-form-card').classList.add('editing');
+  document.getElementById('an-form-card').querySelector('h3').textContent = '✏️ Editando Analista';
+  document.getElementById('an-form-buttons').innerHTML = `
+    <button class="btn bp" onclick="addAnalista()">💾 Salvar Alterações</button>
+    <button class="btn bc" onclick="cancelEditAnalista()">Cancelar</button>`;
+  
+  document.getElementById(`analista-row-${id}`)?.classList.add('editing-row');
+  document.getElementById('an-form-card').scrollIntoView({behavior:'smooth'});
+}
+
+function cancelEditAnalista(){
+  editingAnalistaId = null;
+  document.getElementById('i-an').value = '';
+  document.getElementById('i-at').value = '';
+
+  document.getElementById('an-form-card').classList.remove('editing');
+  document.getElementById('an-form-card').querySelector('h3').textContent = '➕ Cadastrar Analista';
+  document.getElementById('an-form-buttons').innerHTML = '<button class="btn bp" onclick="addAnalista()">➕ Cadastrar</button>';
+
+  document.querySelectorAll('.editing-row').forEach(r => r.classList.remove('editing-row'));
+}
+
+
 /* ═══════════════════════════════════════
    PÁGINA CLIENTES
    ═══════════════════════════════════════ */
@@ -528,23 +645,33 @@ function renderClientes(){
   const fNome=document.getElementById('f-cn').value.toLowerCase();
   const data=clientes
     .filter(c=>(!fTorre||c.torre_id==fTorre)&&(!fNome||c.nome.toLowerCase().includes(fNome)))
-    .map(c=>`<tr>
+    .map(c=>`<tr id="cliente-row-${c.id}" class="${editingClienteId===c.id?'editing-row':''}">
       <td>${c.id}</td><td>${c.nome}</td><td>${tNome(c.torre_id)}</td>
-      <td><button class="bs bdr" onclick="deleteCliente(${c.id},'${c.nome}')">Excluir</button></td>
+      <td>
+        <button class="bs bdo" onclick="editCliente(${c.id})">Editar</button>
+        <button class="bs bdr" onclick="deleteCliente(${c.id},'${c.nome}')">Excluir</button>
+      </td>
      </tr>`).join('');
   document.getElementById('ctb').innerHTML=data;
 }
+
 async function addCliente(){
   const nome=document.getElementById('i-cn').value.trim();
   const torre_id=document.getElementById('i-ct').value;
   if(!nome||!torre_id){toast('Preencha nome e torre','er');return;}
   try{
-    await sf('/clientes',{method:'POST',body:JSON.stringify({nome,torre_id})});
-    toast('Cliente cadastrado!');
-    document.getElementById('i-cn').value='';
+    if(editingClienteId){
+      await sf(`/clientes?id=eq.${editingClienteId}`,{method:'PATCH',body:JSON.stringify({nome,torre_id: Number(torre_id)})});
+      toast('Cliente atualizado!');
+    } else {
+      await sf('/clientes',{method:'POST',body:JSON.stringify({nome,torre_id: Number(torre_id)})});
+      toast('Cliente cadastrado!');
+    }
+    cancelEditCliente();
     await loadAll();
   }catch(e){toast('Erro: '+e.message,'er');}
 }
+
 async function deleteCliente(id,nome){
   modalShow('Excluir Cliente',`Deseja realmente excluir ${nome}? Isso também removerá os acessos registrados para ele.`,async()=>{
     try{
@@ -555,6 +682,38 @@ async function deleteCliente(id,nome){
   });
 }
 
+function editCliente(id){
+  cancelEditCliente();
+  editingClienteId = id;
+  const cliente = clientes.find(c => c.id === id);
+  if (!cliente) return;
+
+  document.getElementById('i-cn').value = cliente.nome;
+  document.getElementById('i-ct').value = cliente.torre_id;
+
+  document.getElementById('cl-form-card').classList.add('editing');
+  document.getElementById('cl-form-card').querySelector('h3').textContent = '✏️ Editando Cliente';
+  document.getElementById('cl-form-buttons').innerHTML = `
+    <button class="btn bp" onclick="addCliente()">💾 Salvar Alterações</button>
+    <button class="btn bc" onclick="cancelEditCliente()">Cancelar</button>`;
+
+  document.getElementById(`cliente-row-${id}`)?.classList.add('editing-row');
+  document.getElementById('cl-form-card').scrollIntoView({behavior:'smooth'});
+}
+
+function cancelEditCliente(){
+  editingClienteId = null;
+  document.getElementById('i-cn').value = '';
+  document.getElementById('i-ct').value = '';
+
+  document.getElementById('cl-form-card').classList.remove('editing');
+  document.getElementById('cl-form-card').querySelector('h3').textContent = '➕ Cadastrar Cliente';
+  document.getElementById('cl-form-buttons').innerHTML = '<button class="btn bp" onclick="addCliente()">➕ Cadastrar</button>';
+
+  document.querySelectorAll('.editing-row').forEach(r => r.classList.remove('editing-row'));
+}
+
+
 /* ═══════════════════════════════════════
    PÁGINA ACESSOS
    ═══════════════════════════════════════ */
@@ -564,14 +723,18 @@ function renderAcessos(){
   const fBusca=document.getElementById('f-x').value.toLowerCase();
   const data=acessos
     .filter(a=>(!fTorre||a.torre_id==fTorre)&&(!fStatus||a.status==fStatus)&&(!fBusca||aNome(a.analista_id).toLowerCase().includes(fBusca)||cNome(a.cliente_id).toLowerCase().includes(fBusca)))
-    .map(a=>`<tr>
+    .map(a=>`<tr id="acesso-row-${a.id}" class="${editingAcessoId===a.id?'editing-row':''}">
       <td>${a.id}</td><td>${aNome(a.analista_id)}</td><td>${cNome(a.cliente_id)}</td><td>${tNome(a.torre_id)}</td>
       <td><span class="bd ${a.status==='liberado'?'bg':(a.status==='pendente'?'bo':'br')}">${a.status}</span></td>
       <td>${formatDate(a.created_at)}</td><td>${a.observacao||'-'}</td>
-      <td><button class="bs bdr" onclick="deleteAcesso(${a.id})">Excluir</button></td>
+      <td>
+        <button class="bs bdo" onclick="editAcesso(${a.id})">Editar</button>
+        <button class="bs bdr" onclick="deleteAcesso(${a.id})">Excluir</button>
+      </td>
      </tr>`).join('');
   document.getElementById('xtb').innerHTML=data;
 }
+
 function onAcessoTorreChange(){
   const tId=document.getElementById('i-xt').value;
   const aSel=document.getElementById('i-xa');
@@ -579,6 +742,7 @@ function onAcessoTorreChange(){
   aSel.innerHTML='<option value="">Selecione...</option>'+analistas.filter(a=>a.torre_id==tId).map(a=>`<option value="${a.id}">${a.nome}</option>`).join('');
   cSel.innerHTML='<option value="">Selecione...</option>'+clientes.filter(c=>c.torre_id==tId).map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
 }
+
 async function addAcesso(){
   const t=document.getElementById('i-xt').value;
   const a=document.getElementById('i-xa').value;
@@ -587,18 +751,29 @@ async function addAcesso(){
   const o=document.getElementById('i-xo').value.trim();
   if(!t||!a||!c){toast('Preencha torre, analista e cliente','er');return;}
   try{
-    await sf('/acessos',{method:'POST',body:JSON.stringify({torre_id:t,analista_id:a,cliente_id:c,status:s,observacao:o})});
-    toast('Acesso registrado!');
+    const body = {torre_id: Number(t), analista_id: Number(a), cliente_id: Number(c), status: s, observacao: o};
+    if(editingAcessoId){
+      await sf(`/acessos?id=eq.${editingAcessoId}`,{method:'PATCH',body:JSON.stringify(body)});
+      toast('Acesso atualizado!');
+    } else {
+      await sf('/acessos',{method:'POST',body:JSON.stringify(body)});
+      toast('Acesso registrado!');
+    }
     ['i-xt','i-xa','i-xc','i-xo'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('i-xs').value='liberado'; // Reset status default
+
     sendNotifEmail(s, {
-  analista: aNome(a),
-  cliente: cNome(c),
-  torre: tNome(t),
-  observacao: o
-});
+      analista: aNome(a),
+      cliente: cNome(c),
+      torre: tNome(t),
+      observacao: o,
+      status: s // Adicionado para o sendNotifEmail
+    });
+    cancelEditAcesso();
     await loadAll();
   }catch(e){toast('Erro: '+e.message,'er');}
 }
+
 async function deleteAcesso(id){
   modalShow('Excluir Acesso',`Deseja realmente excluir o registro de acesso ID ${id}?`,async()=>{
     try{
@@ -609,6 +784,45 @@ async function deleteAcesso(id){
   });
 }
 
+function editAcesso(id){
+  cancelEditAcesso();
+  editingAcessoId = id;
+  const acesso = acessos.find(a => a.id === id);
+  if (!acesso) return;
+
+  document.getElementById('i-xt').value = acesso.torre_id;
+  onAcessoTorreChange(); // Popula analistas e clientes para a torre selecionada
+  document.getElementById('i-xa').value = acesso.analista_id;
+  document.getElementById('i-xc').value = acesso.cliente_id;
+  document.getElementById('i-xs').value = acesso.status;
+  document.getElementById('i-xo').value = acesso.observacao || '';
+
+  document.getElementById('ac-form-card').classList.add('editing');
+  document.getElementById('ac-form-card').querySelector('h3').textContent = '✏️ Editando Acesso';
+  document.getElementById('ac-form-buttons').innerHTML = `
+    <button class="btn bp" onclick="addAcesso()">💾 Salvar Alterações</button>
+    <button class="btn bc" onclick="cancelEditAcesso()">Cancelar</button>`;
+  
+  document.getElementById(`acesso-row-${id}`)?.classList.add('editing-row');
+  document.getElementById('ac-form-card').scrollIntoView({behavior:'smooth'});
+}
+
+function cancelEditAcesso(){
+  editingAcessoId = null;
+  document.getElementById('i-xt').value = '';
+  document.getElementById('i-xa').innerHTML = '<option value="">Selecione a torre primeiro</option>';
+  document.getElementById('i-xc').innerHTML = '<option value="">Selecione a torre primeiro</option>';
+  document.getElementById('i-xs').value = 'liberado';
+  document.getElementById('i-xo').value = '';
+
+  document.getElementById('ac-form-card').classList.remove('editing');
+  document.getElementById('ac-form-card').querySelector('h3').textContent = '➕ Registrar Acesso';
+  document.getElementById('ac-form-buttons').innerHTML = '<button class="btn bp" onclick="addAcesso()">➕ Registrar</button>';
+
+  document.querySelectorAll('.editing-row').forEach(r => r.classList.remove('editing-row'));
+}
+
+
 /* ═══════════════════════════════════════
    PÁGINA NOTIFICAÇÕES
    ═══════════════════════════════════════ */
@@ -616,10 +830,12 @@ function loadNotifCfg(){
   const cfg=JSON.parse(localStorage.getItem('notifCfg')||'{}');
   const libEl=document.getElementById('cfg-lib');
   const pendEl=document.getElementById('cfg-pend');
+  const emailEl=document.getElementById('cfg-email');
   const intEl=document.getElementById('cfg-intervalo');
   const perEl=document.getElementById('cfg-periodo');
   if(libEl) libEl.checked=cfg.lib!==false;
   if(pendEl) pendEl.checked=cfg.pend!==false;
+  if(emailEl) emailEl.value=cfg.email||'';
   if(intEl) intEl.value=cfg.intervalo||15;
   if(perEl) perEl.value=cfg.periodo||'comercial';
 }
@@ -627,6 +843,7 @@ function saveNotifCfg(){
   const cfg={
     lib:document.getElementById('cfg-lib').checked,
     pend:document.getElementById('cfg-pend').checked,
+    email:document.getElementById('cfg-email').value.trim(),
     intervalo:parseInt(document.getElementById('cfg-intervalo').value)||15,
     periodo:document.getElementById('cfg-periodo').value||'comercial'
   };
@@ -643,12 +860,11 @@ function dentroDoPeriodo(){
   if(p==='comercial') return h>=8&&h<18;
   if(p==='manha') return h>=8&&h<12;
   if(p==='tarde') return h>=12&&h<18;
-  if(p==='noturno') return h>=18&&h<23;
-  return false;
+  return false; // Fora do período se noturno ou outro não especificado
 }
-function logNotif(tipo,analista,cliente,torre){
+function logNotif(tipo,analista,cliente,torre, observacao = ''){
   const log=JSON.parse(localStorage.getItem('notifLog')||'{"lib":[],"pend":[]}');
-  const entry={msg:analista+' → '+cliente+' ('+torre+')',dt:new Date().toLocaleString('pt-BR')};
+  const entry={analista, cliente, torre, observacao, dt:new Date().toLocaleString('pt-BR')};
   if(tipo==='liberado'){log.lib.unshift(entry);log.lib=log.lib.slice(0,100);}
   else{log.pend.unshift(entry);log.pend=log.pend.slice(0,100);}
   localStorage.setItem('notifLog',JSON.stringify(log));
@@ -658,37 +874,45 @@ function renderNotifLogs(){
   const log=JSON.parse(localStorage.getItem('notifLog')||'{"lib":[],"pend":[]}');
   const libEl=document.getElementById('nlog-lib');
   const pendEl=document.getElementById('nlog-pend');
+  
   if(libEl){
     libEl.innerHTML=log.lib.length?log.lib.map(e=>{
-      const txt=e.msg||(e.analista?`${e.analista} → ${e.cliente||''} (${e.torre||''})`:'Sem detalhes');
-      return `<div class="nl"><div class="ni">✅</div><div class="nt"><span class="ntag tl">Liberado</span>${txt}</div><div class="nd">${e.dt||e.data||''}</div></div>`;
+      const obsText = e.observacao ? ` (${e.observacao})` : '';
+      return `<div class="nl"><div class="ni">✅</div><div class="nt"><span class="ntag tl">Liberado</span>${e.analista} → ${e.cliente} (${e.torre})${obsText}</div><div class="nd">${e.dt}</div></div>`;
     }).join(''):'<div style="text-align:center;color:#999;padding:1rem">Nenhum envio registrado.</div>';
   }
   if(pendEl){
     pendEl.innerHTML=log.pend.length?log.pend.map(e=>{
-      const txt=e.msg||(e.analista?`${e.analista} → ${e.cliente||''} (${e.torre||''})`:'Sem detalhes');
-      return `<div class="nl"><div class="ni">⚠️</div><div class="nt"><span class="ntag tp">Pendente</span>${txt}</div><div class="nd">${e.dt||e.data||''}</div></div>`;
+      const obsText = e.observacao ? ` (${e.observacao})` : '';
+      return `<div class="nl"><div class="ni">⚠️</div><div class="nt"><span class="ntag tp">Pendente</span>${e.analista} → ${e.cliente} (${e.torre})${obsText}</div><div class="nd">${e.dt}</div></div>`;
     }).join(''):'<div style="text-align:center;color:#999;padding:1rem">Nenhum envio registrado.</div>';
   }
 }
 async function sendNotifEmail(tipo, dados){
   const cfg = JSON.parse(localStorage.getItem('notifCfg') || '{}');
+  if (!cfg.email) {
+    console.warn('E-mail de destino não configurado para notificações.');
+    return;
+  }
   if ((tipo === 'liberado' && cfg.lib === false) || (tipo === 'pendente' && cfg.pend === false)) return;
   if (!dentroDoPeriodo()) { console.log('Fora do período de envio'); return; }
 
   const tpl = tipo === 'liberado' ? EJS_TPL_LIB : EJS_TPL_PEND;
 
   // Calcula estatísticas da torre para o template liberado
-  const torreId = torres.find(t => t.nome === dados.torre)?.id;
-  const libCount = acessos.filter(a => a.torre_id === torreId && a.status === 'liberado').length;
-  const pendCount = acessos.filter(a => a.torre_id === torreId && a.status === 'pendente').length;
-  const total = libCount + pendCount;
-  const perc = total > 0 ? ((libCount / total) * 100).toFixed(1) : '0';
+  const torreObj = torres.find(t => t.nome === dados.torre);
+  const torreId = torreObj ? torreObj.id : null;
 
   let params;
 
   if (tipo === 'liberado') {
+    const libCount = acessos.filter(a => a.torre_id === torreId && a.status === 'liberado').length;
+    const pendCount = acessos.filter(a => a.torre_id === torreId && a.status === 'pendente').length;
+    const total = libCount + pendCount;
+    const perc = total > 0 ? ((libCount / total) * 100).toFixed(1) : '0';
+    
     params = {
+      to_email:    cfg.email, // E-mail de destino do gestor/analista
       torre:       dados.torre || 'N/A',
       analista:    dados.analista || 'N/A',
       cliente:     dados.cliente || 'N/A',
@@ -698,20 +922,30 @@ async function sendNotifEmail(tipo, dados){
       pendentes:   String(pendCount),
       percentual:  perc
     };
-  } else {
+  } else { // tipo === 'pendente'
+    const acessoPendente = acessos.find(a => 
+      a.analista_id === analistas.find(an=>an.nome === dados.analista)?.id &&
+      a.cliente_id === clientes.find(cl=>cl.nome === dados.cliente)?.id &&
+      a.torre_id === torreId
+    );
+    
+    const diasPendentes = acessoPendente ? Math.floor((new Date().getTime() - new Date(acessoPendente.created_at).getTime()) / (1000 * 60 * 60 * 24)) : 0;
+    const dataInicio = acessoPendente ? new Date(acessoPendente.created_at).toLocaleDateString('pt-BR') : 'N/A';
+
     params = {
+      to_email:    cfg.email, // E-mail de destino do gestor/analista
       torre:       dados.torre || 'N/A',
       analista:    dados.analista || 'N/A',
       cliente:     dados.cliente || 'N/A',
-      dias:        dados.dias || '0',
-      data_inicio: dados.data_inicio || new Date().toLocaleDateString('pt-BR'),
+      dias:        String(diasPendentes),
+      data_inicio: dataInicio,
       observacao:  dados.observacao || 'Sem observações'
     };
   }
 
   try {
     await emailjs.send(EJS_SVC, tpl, params);
-    logNotif(tipo, dados.analista, dados.cliente, dados.torre);
+    logNotif(tipo, dados.analista, dados.cliente, dados.torre, dados.observacao);
     toast('📧 Notificação enviada!');
   } catch(e) {
     console.error('Erro EmailJS:', e);
@@ -719,17 +953,48 @@ async function sendNotifEmail(tipo, dados){
   }
 }
 
+async function testNotif(){
+  const cfg = JSON.parse(localStorage.getItem('notifCfg') || '{}');
+  if(!cfg.email) { toast('Configure um e-mail de destino primeiro.','er'); return; }
+
+  // Simula um acesso liberado
+  const sampleAcessoLiberado = {
+    analista: analistas.length > 0 ? analistas[0].nome : 'Analista Teste',
+    cliente: clientes.length > 0 ? clientes[0].nome : 'Cliente Teste',
+    torre: torres.length > 0 ? torres[0].nome : 'Torre Teste',
+    observacao: 'Teste de notificação LIBERADO'
+  };
+  await sendNotifEmail('liberado', sampleAcessoLiberado);
+
+  // Simula um acesso pendente
+  const sampleAcessoPendente = {
+    analista: analistas.length > 0 ? analistas[0].nome : 'Analista Teste',
+    cliente: clientes.length > 0 ? clientes[0].nome : 'Cliente Teste',
+    torre: torres.length > 0 ? torres[0].nome : 'Torre Teste',
+    observacao: 'Teste de notificação PENDENTE'
+  };
+  await sendNotifEmail('pendente', sampleAcessoPendente);
+}
+
 function checkPendNotif(){
   const cfg=JSON.parse(localStorage.getItem('notifCfg')||'{}');
-  if(cfg.pend===false||!dentroDoPeriodo()) return;
-  acessos.filter(a=>a.status==='pendente').forEach(a=>{
-    const key='notif_pend_'+a.id;
-    if(!sessionStorage.getItem(key)){
-      sendNotifEmail('pendente',{analista:aNome(a.analista_id),cliente:cNome(a.cliente_id),torre:tNome(a.torre_id)});
-      sessionStorage.setItem(key,'1');
+  if(cfg.pend===false||!dentroDoPeriodo()||!cfg.email) return;
+
+  const acessosPendentes = acessos.filter(a => a.status === 'pendente');
+  acessosPendentes.forEach(a => {
+    const key='notif_pend_'+a.id; // Chave para rastrear se já enviou
+    if(!sessionStorage.getItem(key)){ // Se não enviou para este acesso ainda
+      sendNotifEmail('pendente',{
+        analista: aNome(a.analista_id),
+        cliente: cNome(a.cliente_id),
+        torre: tNome(a.torre_id),
+        observacao: a.observacao || ''
+      });
+      sessionStorage.setItem(key,'1'); // Marca como enviado
     }
   });
 }
+
 
 /* ═══════════════════════════════════════
    PÁGINA ÚLTIMO LOGIN
@@ -753,7 +1018,7 @@ function renderLogins(){
   const kpis={total:filteredLogins.length,crit:0,warn:0,ok:0};
   const data=filteredLogins.map((l,i)=>{
     if(l.dias>10)kpis.crit++;else if(l.dias>=5)kpis.warn++;else kpis.ok++;
-    return `<tr id="login-row-${l.id}" class="${editingId===l.id?'editing-row':''}">
+    return `<tr id="login-row-${l.id}" class="${editingLoginId===l.id?'editing-row':''}">
       <td>${i+1}</td>
       <td><span class="badge ${l.crit.cls}">${l.crit.label}</span></td>
       <td>${l.dias}</td>
@@ -780,11 +1045,11 @@ async function registrarLogin(){
   const cId=document.getElementById('l-i-cliente').value;
   const dt=document.getElementById('l-i-datahora').value;
   if(!tId||!aId||!cId||!dt){toast('Preencha todos os campos','er');return;}
-  const body={torre_id:tId,analista_id:aId,cliente_id:cId,ultimo_login:new Date(dt).toISOString()};
+  const body={torre_id: Number(tId), analista_id: Number(aId), cliente_id: Number(cId), ultimo_login: new Date(dt).toISOString()};
 
   try{
-    if(editingId){
-      await sf('/ultimo_login?id=eq.'+editingId,{method:'PATCH',body:JSON.stringify(body)});
+    if(editingLoginId){
+      await sf('/ultimo_login?id=eq.'+editingLoginId,{method:'PATCH',body:JSON.stringify(body)});
       toast('Registro atualizado!');
     }else{
       await sf('/ultimo_login',{method:'POST',body:JSON.stringify(body),headers:{...HD,'Prefer':'return=representation,resolution=merge-duplicates'}});
@@ -806,7 +1071,7 @@ function onLoginTorreChange(){
 }
 function editLogin(id){
   cancelEditLogin();
-  editingId=id;
+  editingLoginId=id;
   const login=logins.find(l=>l.id===id);
   if(!login)return;
   
@@ -824,11 +1089,11 @@ function editLogin(id){
     <button class="btn bp" onclick="registrarLogin()">💾 Salvar Alterações</button>
     <button class="btn bc" onclick="cancelEditLogin()">Cancelar</button>`;
   
-  document.getElementById('login-row-'+id)?.classList.add('editing-row');
+  document.getElementById(`login-row-${id}`)?.classList.add('editing-row');
   document.getElementById('l-form-card').scrollIntoView({behavior:'smooth'});
 }
 function cancelEditLogin(){
-  editingId=null;
+  editingLoginId=null;
   ['l-i-torre','l-i-analista','l-i-cliente'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('l-i-analista').innerHTML='<option value="">Selecione a torre</option>';
   document.getElementById('l-i-cliente').innerHTML='<option value="">Selecione a torre</option>';
@@ -885,6 +1150,7 @@ function downloadFile(data,filename,type){
    ═══════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', async()=>{
   await loadAll();
+  loadNotifCfg(); // Carrega as configs de notificação ao iniciar
   const cfgInit=JSON.parse(localStorage.getItem('notifCfg')||'{}');
   const intervaloMs=(cfgInit.intervalo||15)*60000;
   window._notifTimer=setInterval(checkPendNotif,intervaloMs);
