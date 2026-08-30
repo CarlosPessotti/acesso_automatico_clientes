@@ -9,7 +9,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
-:root{--red:#BF0411;--rd:#C00000;--gl:#E9E9E9;--gm:#CBCBCB;--w:#fff;--d:#1a1a1a;--grn:#2ecc71;--org:#e67e22;--yel:#f1c40f;--f:'Segoe UI',system-ui,sans-serif}
+/* DE (laranja HML): */
+:root{--org:#ff6b35;--rd:#C00000;--gl:#E9E9E9;--gm:#CBCBCB;--w:#fff;--d:#1a1a1a;--grn:#2ecc71;--org:#e67e22;--yel:#f1c40f;--f:'Segoe UI',system-ui,sans-serif}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:var(--f);background:var(--gl);color:var(--d);min-height:100vh;padding-bottom:40px}
 
@@ -26,9 +27,9 @@ body{font-family:var(--f);background:var(--gl);color:var(--d);min-height:100vh;p
 .kc{background:var(--w);border-radius:12px;padding:1.1rem;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid var(--red)}
 .kc .n{font-size:2rem;font-weight:800;color:var(--red)}.kc .l{font-size:.76rem;color:#666;margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
 .kc.g{border-left-color:var(--grn)}.kc.g .n{color:var(--grn)}
-.kc.o{border-left-color:var(--org)}.kc.o .n{color:var(--org)}
+.kc.o{border-left-color:var(--red)}.kc.o .n{color:var(--red)}
 .kc.crit{border-left-color:#dc3545}.kc.crit .n{color:#dc3545}
-.kc.warn{border-left-color:var(--org)}.kc.warn .n{color:var(--org)}
+.kc.warn{border-left-color:var(--red)}.kc.warn .n{color:var(--red)}
 .kc.ok{border-left-color:var(--grn)}.kc.ok .n{color:var(--grn)}
 
 .cg{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem}
@@ -52,7 +53,7 @@ tbody tr.editing-row{background:#fff8e1 !important}
 
 .fc{background:var(--w);border-radius:12px;padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:1.5rem}
 .fc h3{margin-bottom:1rem;font-size:1rem;color:var(--red)}
-.fc.editing{border:2px solid var(--org);box-shadow:0 0 0 3px rgba(230,126,34,.15)}.fc.editing h3{color:var(--org)}
+.fc.editing{border:2px solid var(--red);box-shadow:0 0 0 3px rgba(230,126,34,.15)}.fc.editing h3{color:var(--red)}
 
 .fr{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1rem}
 .fg{display:flex;flex-direction:column;gap:4px}
@@ -64,7 +65,7 @@ tbody tr.editing-row{background:#fff8e1 !important}
 .btn{padding:10px 22px;border:none;border-radius:8px;font-size:.83rem;font-weight:700;cursor:pointer;transition:.2s;font-family:var(--f);display:inline-flex;align-items:center;gap:6px}
 .bp{background:var(--red);color:var(--w)}.bp:hover{background:var(--rd);transform:translateY(-1px)}
 .bs{padding:5px 12px;font-size:.75rem;border:none;border-radius:6px;cursor:pointer;font-weight:600;color:var(--w)}
-.bdr{background:#dc3545}.bdg{background:var(--grn)}.bdo{background:var(--org)}
+.bdr{background:#dc3545}.bdg{background:var(--grn)}.bdo{background:var(--red)}
 .bc{background:#666;color:var(--w);margin-left:8px}.bc:hover{background:#555}
 
 .fb{display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:1.5rem;background:var(--w);padding:1rem 1.2rem;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
@@ -153,12 +154,13 @@ tbody tr.editing-row{background:#fff8e1 !important}
 </div>
 
 <script>
-// URL e Key de PRODUÇÃO
+// DE (HML):
+const SB = 'https://nmuveemszyfvqxcnpoog.supabase.co/rest/v1';
+const AK = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tdXZlZW1zenlmdnF4Y25wb29nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwMzAxMzQsImV4cCI6MjEwMzYwNjEzNH0.kNtTNLQhbzyeg2qvCGPg0ztT9NzTgo2ayzHLYnyE-2E';
+
+// PARA (PRD):
 const SB = 'https://mwwlimmkiphwdeleewzd.supabase.co/rest/v1';
 const AK = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13d2xpbW1raXBod2RlbGVld3pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3ODIwNTcsImV4cCI6MjEwMzM1ODA1N30.HKGRI3toztOUThxXnIXFqFcKnjPPi4c1WzYq-2tz3Zc';
-const HD = {'apikey': AK, 'Authorization': 'Bearer ' + AK, 'Content-Type': 'application/json', 'Prefer': 'return=representation'};
-
-// [TODO RESTANTE DO CÓDIGO JAVASCRIPT IGUAL AO HML]
 </script>
 
 </body>
