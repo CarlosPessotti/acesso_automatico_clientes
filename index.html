@@ -348,18 +348,29 @@ function renderNotifLogs(){
   document.getElementById('ntb').innerHTML=html||'<tr><td colspan="4" style="text-align:center;color:#999">Nenhuma notificação enviada ainda</td></tr>';
 }
 function enviarNotificacao(){
-  var tipo=document.getElementById('n-tipo').value;
-  var dest='carlos.pessotti@service.com.br';
-  var assunto,corpo;
-  if(tipo==='pendente'){
-    var pend=acessos.filter(function(a){return a.status==='pendente'});
-    assunto='Acessos Pendentes — Gestão Torres ('+pend.length+')';
-    corpo='Existem '+pend.length+' acessos pendentes.';
-  }else{
-    var lib=acessos.filter(function(a){return a.status==='liberado'});
-    assunto='Acessos Liberados — Gestão Torres ('+lib.length+')';
-    corpo='Total de '+lib.length+' acessos liberados.';
+  var tipo = document.getElementById('n-tipo').value;
+  var dest = 'carlos.pessotti@service.com.br';
+  var assunto, corpo;
+  if(tipo === 'pendente'){
+    var pend = acessos.filter(function(a){return a.status==='pendente'});
+    assunto = 'Acessos Pendentes (' + pend.length + ')';
+    corpo = pend.length + ' acessos pendentes encontrados.';
+  } else {
+    var lib = acessos.filter(function(a){return a.status==='liberado'});
+    assunto = 'Acessos Liberados (' + lib.length + ')';
+    corpo = lib.length + ' acessos liberados.';
   }
+  // Registra no log local
+  notifLog.unshift({
+    data: new Date().toLocaleString('pt-BR'),
+    tipo: assunto,
+    dest: dest,
+    ok: true
+  });
+  localStorage.setItem('notifLog', JSON.stringify(notifLog.slice(0,50)));
+  renderNotifLogs();
+  toast('Notificação registrada! (simulação)');
+}
   toast('Notificação registrada (simulação)');
   notifLog.unshift({data:new Date().toLocaleString('pt-BR'),tipo:assunto,dest:dest,ok:true});
   try{localStorage.setItem('notifLog',JSON.stringify(notifLog.slice(0,50)))}catch(e){}
