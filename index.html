@@ -207,7 +207,7 @@ table{display:block;overflow-x:auto;white-space:nowrap}
 <div class="kr">
 <div class="kc"><div class="n" id="k1">-</div><div class="l">Torres</div></div>
 <div class="kc"><div class="n" id="k2">-</div><div class="l">Analistas</div></div>
-<div class="kc"><div class="n" id="k3">-</div><div class="l">Contratos</div></div>
+<div class="kc"><div class="n" id="k3">-</div><div class="l">Clientes</div></div>
 <div class="kc g"><div class="n" id="k4">-</div><div class="l">Acessos Liberados</div></div>
 <div class="kc o"><div class="n" id="k5">-</div><div class="l">Acessos Pendentes</div></div>
 </div>
@@ -456,7 +456,7 @@ function filterAcessoSel(){var tid=document.getElementById('i-xt').value;documen
 function filterLoginSel(){var tid=document.getElementById('l-i-torre').value;document.getElementById('l-i-analista').innerHTML='<option value="">Selecione...</option>'+analistas.filter(function(a){return!tid||a.torre_id==tid}).map(function(a){return'<option value="'+a.id+'">'+a.nome+'</option>'}).join('');document.getElementById('l-i-cliente').innerHTML='<option value="">Selecione...</option>'+clientes.filter(function(c){return!tid||c.torre_id==tid}).map(function(c){return'<option value="'+c.id+'">'+c.nome+'</option>'}).join('')}
 
 /* DASHBOARD */
-function renderDash(){document.getElementById('k1').textContent=torres.length;document.getElementById('k2').textContent=analistas.length;document.getElementById('k3').textContent=clientes.length;document.getElementById('k4').textContent=acessos.filter(function(a){return a.status==='liberado'}).length;document.getElementById('k5').textContent=acessos.filter(function(a){return a.status==='pendente'}).length;document.getElementById('dtb').innerHTML=torres.map(function(t){var an=analistas.filter(function(a){return a.torre_id===t.id}).length;var cl=clientes.filter(function(c){return c.torre_id===t.id}).length;var li=acessos.filter(function(a){return a.torre_id===t.id&&a.status==='liberado'}).length;var pe=acessos.filter(function(a){return a.torre_id===t.id&&a.status==='pendente'}).length;var tot=li+pe;var perc=tot>0?((li/tot)*100).toFixed(1)+'%':'0%';return'<tr><td>'+t.nome+'</td><td>'+cl+'</td><td>'+an+'</td><td>'+li+'</td><td>'+pe+'</td><td>'+perc+'</td></tr>'}).join('')}
+document.getElementById('k3').textContent = new Set(clientes.map(function(c){ return c.nome })).size;document.getElementById('k2').textContent=analistas.length;document.getElementById('k3').textContent=clientes.length;document.getElementById('k4').textContent=acessos.filter(function(a){return a.status==='liberado'}).length;document.getElementById('k5').textContent=acessos.filter(function(a){return a.status==='pendente'}).length;document.getElementById('dtb').innerHTML=torres.map(function(t){var an=analistas.filter(function(a){return a.torre_id===t.id}).length;var cl=clientes.filter(function(c){return c.torre_id===t.id}).length;var li=acessos.filter(function(a){return a.torre_id===t.id&&a.status==='liberado'}).length;var pe=acessos.filter(function(a){return a.torre_id===t.id&&a.status==='pendente'}).length;var tot=li+pe;var perc=tot>0?((li/tot)*100).toFixed(1)+'%':'0%';return'<tr><td>'+t.nome+'</td><td>'+cl+'</td><td>'+an+'</td><td>'+li+'</td><td>'+pe+'</td><td>'+perc+'</td></tr>'}).join('')}
 
 /* GRÁFICOS */
 function renderCharts(){Object.keys(charts).forEach(function(k){if(charts[k]){charts[k].destroy();charts[k]=null}});var colors=['#BF0411','#e74c3c','#e67e22','#f39c12','#2ecc71','#1abc9c','#3498db','#9b59b6','#34495e','#95a5a6','#d35400','#c0392b'];
