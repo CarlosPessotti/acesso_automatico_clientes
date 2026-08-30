@@ -9,6 +9,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
+.nav h1 .env-badge {
+  font-size: .7rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+  background: #ffd93d;
+  color: #1a1a1a;
+}
 :root{--red:#BF0411;--rd:#C00000;--gl:#E9E9E9;--gm:#CBCBCB;--w:#fff;--d:#1a1a1a;--grn:#2ecc71;--org:#e67e22;--f:'Segoe UI',system-ui,sans-serif}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:var(--f);background:var(--gl);color:var(--d);min-height:100vh;padding-bottom:40px}
@@ -175,6 +183,8 @@ table{display:block;overflow-x:auto;white-space:nowrap}
 <button class="dm-toggle" onclick="toggleDark()" id="dm-btn">🌙</button>
 </nav>
 </div>
+
+
 
 <div class="tc" id="toasts"></div>
 <div class="sbar"><span class="sd" id="sdot"></span><span id="stxt">Conectando...</span></div>
