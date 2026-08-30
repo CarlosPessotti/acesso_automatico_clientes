@@ -588,16 +588,157 @@ function renderLogins(){
   document.getElementById('l-tb').innerHTML=sorted.map(l=>`<tr id="lg-row-${l.id}"><td>${l.id}</td><td>${tNome(l.torre_id)}</td><td>${aNome(l.analista_id)}</td><td>${cNome(l.cliente_id)}</td><td>${formatDate(l.ultimo_login)}</td><td>${l.dias}</td><td><span class="badge ${l.crit.cls}">${l.crit.label}</span></td><td><button class="bs bdo" onclick='editLogin(${JSON.stringify(l)})'>Editar</button> <button class="bs bdr" onclick="deleteLogin(${l.id})">Excluir</button></td></tr>`).join('');
 }
 
-async function addLogin(){
-  const torre_id=document.getElementById('l-i-torre').value,analista_id=document.getElementById('l-i-analista').value;
-  const cliente_id=document.getElementById('l-i-cliente').value,ultimo_login=document.getElementById('l-i-data').value;
-  if(!torre_id||!analista_id||!cliente_id||!ultimo_login){toast('Preencha todos os campos','er');return}
+encha todos os campos','er');return}
   try{
     if(editingLoginId){await sf('/ultimo_login?id=eq.'+editingLoginId,{method:'PATCH',body:JSON.stringify({torre_id,analista_id,cliente_id,ultimo_login})});toast('Login atualizado!')}
     else{await sf('/ultimo_login',{method:'POST',body:JSON.stringify({torre_id,analista_id,cliente_id,ultimo_login})});toast('Login registrado!')}
     cancelEditLogin();await loadAll();
   }catch(e){toast('Erro: '+e.message,'er')}
 }
+
+function editLogin(l){
+  cancelEditLogin();editingLoginId=l.id;
+  document.getElementById('l-i-torre').value=l.torre_id;
+  document.getElementById('l-i-torre').dispatchEvent(new Event('change'));
+  setTimeout(()=>{document.getElementById('l-i-analista').value=l.analista_id;document.getElementById('l-i-cliente').value=l.cliente_id},100);
+  if(l.ultimo_login){const dt=new Date(l.ultimo_login);document.getElementById('l-i-data').value=dt.toISOString().slice(0,16)}
+  document.getElementById('form-login').classList.add('editing');
+  document.getElementById('form-login-title').textContent='✏️ Editando Login';
+  document.getElementById('btn-add-login').textContent='Salvar';
+  document.getElementById('btn-cancel-login').style.display='inline-flex';
+  const row=document.getElementById('lg-row-'+l.id);if(row)row.classList.add('editing-row');
+}
+
+function cancelEditLogin(){
+  editingLoginId=null;document.getElementById('l-i-torre').value='';document.getElementById('l-i-data').value='';
+  document.getElementById('form-login').classList.remove('editing');
+  document.getElementById('form-login-title').textContent='➕ Registrar Último Login';
+  document.getElementById('btn-add-login').textContent='Registrar';
+  document.getElementById('btn-cancel-login').style.display='none';
+  document.querySelectorAll('.editing-row').forEach(r=>r.classList.remove('editing-row'));
+}
+
+function deleteLogin(id){modalShow('⚠️ Confirmar exclusão','Excluir este registro de login?',async()=>{try{await sf('/ultimo_login?id=eq.'+id,{method:'DELETE'});toast('Login excluído!');await loadAll()}catch(e){toast('Erro: '+e.message,'er')}})}
+
+/* ═══════════════════════════════════════
+   NOTIFICAÇÕES
+   ═══════════════════════════════════════ */
+function renderNotifLogs(){
+  document.getElementById('ntb').innerHTML=notifLog.map(n=>`<tr><td>${n.data}</td><td>${n.tipo}</td><td>${n.dest}</td><td><span class="bd ${n.ok?'bg':'br'}">${n.ok?'Enviado':'Falha'}</span></td></tr>`).join('');
+}
+
+async function enviarNotificacao(){
+  const tipo=document.getElementById('n-tipo').value;
+  const dest='carlos.pessotti@service.com.br';
+  let assunto,corpo;
+  if(tipo==='pendente'){
+    const pend=acessos.filter(a=>a.status==='pendente');
+    assunto='⚠️ Acessos Pendentes — Gestão Torres ('+pend.length+')';
+    corpo='Existem '+pend.length+' acessos pendentes:\n\n'+pend.map(a=>'• '+cNome(a.cliente_id)+' — '+tNome(a.torre_id)+' — '+aNome(a.analista_id)+(a.observacao?' ('+a.observacao+')':'')).join('\n');
+  }else{
+    const lib=acessos.filter(a=>a.status==='liberado');
+    assunto='✅ Acessos Liberados — Gestão Torres ('+lib.length+')';
+    corpo='Total de '+lib.length+' acessos liberados:\n\n'+lib.map(a=>'• '+cNome(a.cliente_id)+' — '+tNome(a.torre_id)+' — '+aNome(a.analista_id)).join('\n');
+  }
+  toast('Enviando e-mail...');
+  try{
+    await emailjs.send('service_torres','acesso_pendente_service',{to_email:dest,subject:assunto,message:corpo});
+    toast('E-mail enviado com sucesso!');
+    notifLog.unshift({data:new Date().toLocaleString('pt-BR'),tipo:assunto,dest,ok:true});
+  }catch(e){
+    toast('Falha ao enviar: '+e.message,'er');
+    notifLog.unshift({data:new Date().toLocaleString('pt-BR'),tipo:assunto,dest,ok:false});
+  }
+  localStorage.setItem('notifLog',JSON.stringify(notifLog.slice(0,50)));
+  renderNotifLogs();
+}
+
+/* ═══════════════════════════════════════
+   EXPORTAÇÕES — DASHBOARD
+   ═══════════════════════════════════════ */
+function getDashData(){
+  return torres.map(t=>{
+    const an=analistas.filter(a=>a.torre_id===t.id).length,cl=clientes.filter(c=>c.torre_id===t.id).length;
+    const li=acessos.filter(a=>a.torre_id===t.id&&a.status==='liberado').length;
+    const pe=acessos.filter(a=>a.torre_id===t.id&&a.status==='pendente').length;
+    const tot=li+pe,perc=tot>0?((li/tot)*100).toFixed(1)+'%':'0%';
+    return{Torre:t.nome,Clientes:cl,Analistas:an,Liberados:li,Pendentes:pe,'% Liberados':perc};
+  });
+}
+
+function exportDash(fmt){
+  const data=getDashData();if(!data.length){toast('Sem dados','er');return}
+  if(fmt==='csv')downloadCSV(data,'dashboard_torres.csv');
+  else if(fmt==='xlsx')downloadXLSX(data,'dashboard_torres.xlsx');
+  else if(fmt==='txt')downloadTXT(data,'dashboard_torres.txt');
+  else if(fmt==='pdf')downloadPDF(data,'Dashboard — Torres','dashboard_torres.pdf');
+}
+
+function getAcessosData(){
+  return acessos.map(a=>({ID:a.id,Torre:tNome(a.torre_id),Analista:aNome(a.analista_id),Cliente:cNome(a.cliente_id),Status:a.status,Observacao:a.observacao||'',Data:formatDate(a.updated_at)}));
+}
+
+function exportAcessos(fmt){
+  const data=getAcessosData();if(!data.length){toast('Sem dados','er');return}
+  if(fmt==='csv')downloadCSV(data,'acessos.csv');
+  else if(fmt==='xlsx')downloadXLSX(data,'acessos.xlsx');
+  else if(fmt==='txt')downloadTXT(data,'acessos.txt');
+  else if(fmt==='pdf')downloadPDF(data,'Relatório de Acessos','acessos.pdf');
+}
+
+function getLoginsData(){
+  return logins.map(l=>{const d=diasSemLogin(l.ultimo_login);const cr=criticidadeLogin(d);return{ID:l.id,Torre:tNome(l.torre_id),Analista:aNome(l.analista_id),Cliente:cNome(l.cliente_id),'Último Login':formatDate(l.ultimo_login),Dias:d,Status:cr.txt}});
+}
+
+function exportLogins(fmt){
+  const data=getLoginsData();if(!data.length){toast('Sem dados','er');return}
+  if(fmt==='csv')downloadCSV(data,'ultimo_login.csv');
+  else if(fmt==='xlsx')downloadXLSX(data,'ultimo_login.xlsx');
+  else if(fmt==='txt')downloadTXT(data,'ultimo_login.txt');
+  else if(fmt==='pdf')downloadPDF(data,'Relatório Último Login','ultimo_login.pdf');
+}
+
+/* ═══════════════════════════════════════
+   FUNÇÕES DE DOWNLOAD
+   ═══════════════════════════════════════ */
+function downloadCSV(data,filename){
+  const keys=Object.keys(data[0]);
+  const csv=[keys.join(','),...data.map(r=>keys.map(k=>'"'+(r[k]??'')+'"').join(','))].join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
+  toast('CSV exportado!');
+}
+
+function downloadXLSX(data,filename){
+  const ws=XLSX.utils.json_to_sheet(data);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Dados');XLSX.writeFile(wb,filename);
+  toast('Excel exportado!');
+}
+
+function downloadTXT(data,filename){
+  const keys=Object.keys(data[0]);
+  const txt=data.map(r=>keys.map(k=>k+': '+r[k]).join(' | ')).join('\n');
+  const blob=new Blob([txt],{type:'text/plain;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
+  toast('TXT exportado!');
+}
+
+function downloadPDF(data,title,filename){
+  const{jsPDF}=window.jspdf;const doc=new jsPDF();
+  doc.setFontSize(16);doc.setTextColor(191,4,17);doc.text(title,14,20);
+  doc.setFontSize(8);doc.setTextColor(100);doc.text('Gerado em: '+new Date().toLocaleString('pt-BR'),14,28);
+  const keys=Object.keys(data[0]);
+  doc.autoTable({startY:34,head:[keys],body:data.map(r=>keys.map(k=>r[k]??'')),headStyles:{fillColor:[191,4,17]},styles:{fontSize:7}});
+  doc.save(filename);
+  toast('PDF exportado!');
+}
+
+/* ═══════════════════════════════════════
+   INICIALIZAÇÃO
+   ═══════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', loadAll);
+</script>
+</body>
+</html>
 
 function editLogin(l){
   cancelEditLogin();editingLoginId=l.id;
