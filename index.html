@@ -84,7 +84,75 @@ tbody td{padding:9px 12px;border-bottom:1px solid var(--gl)}tbody tr:hover{backg
 <div class="fb"><div class="fg"><label>Filtrar por Torre</label><select id="f-ct" onchange="renderClientes()"></select></div><div class="fg"><label>Filtrar por Nome</label><input type="text" id="f-cn" oninput="renderClientes()"></div></div>
 <div class="tw"><h3>Lista de Clientes</h3><table><thead><tr><th>ID</th><th>Nome</th><th>Torre</th><th>Ações</th></tr></thead><tbody id="ctb"></tbody></table></div>
 </div>
+<!-- NOTIFICAÇÕES -->
 <div class="pg" id="pg-notificacoes">
+  <!-- Resumo -->
+  <div class="kr">
+    <div class="kc" style="border-left-color:var(--org)"><div class="n" style="color:var(--org)" id="n-pend">-</div><div class="l">Pendentes</div></div>
+    <div class="kc g"><div class="n" id="n-lib">-</div><div class="l">Liberados</div></div>
+    <div class="kc"><div class="n" id="n-total">-</div><div class="l">Total Enviados</div></div>
+  </div>
+
+  <!-- Config -->
+  <div class="fc">
+    <h3>⚙️ Configuração de Notificações</h3>
+    <div class="fr">
+      <div class="fg">
+        <label>Destinatário</label>
+        <input type="email" id="n-email" value="carlos.pessotti@service.com.br">
+      </div>
+      <div class="fg">
+        <label>Período automático</label>
+        <select id="n-periodo">
+          <option value="0">Desativado</option>
+          <option value="1">Diário</option>
+          <option value="7">Semanal</option>
+          <option value="15">Quinzenal</option>
+          <option value="30">Mensal</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Status</label>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+          <label class="tgl">
+            <input type="checkbox" id="n-ativo" onchange="salvarConfigNotif()">
+            <span class="tgl-s"></span>
+          </label>
+          <span id="n-ativo-label" style="font-size:.82rem;color:#666">Inativo</span>
+        </div>
+      </div>
+    </div>
+    <button class="btn bp" onclick="salvarConfigNotif()" style="margin-top:.5rem">💾 Salvar Configuração</button>
+  </div>
+
+  <!-- Envio manual -->
+  <div class="fc">
+    <h3>📧 Enviar Notificação Manual</h3>
+    <div class="fr">
+      <div class="fg">
+        <label>Tipo</label>
+        <select id="n-tipo">
+          <option value="pendente">Acessos Pendentes</option>
+          <option value="liberado">Liberações Concluídas</option>
+          <option value="resumo">Resumo Geral</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn bp" onclick="enviarNotificacao()">📤 Enviar E-mail</button>
+  </div>
+
+  <!-- Log -->
+  <div class="tw">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <h3 style="margin:0">📋 Histórico de Notificações</h3>
+      <button class="bs bdr" onclick="limparLogNotif()">🗑️ Limpar Log</button>
+    </div>
+    <table>
+      <thead><tr><th>Data</th><th>Tipo</th><th>Destinatário</th><th>Detalhes</th><th>Status</th></tr></thead>
+      <tbody id="ntb"></tbody>
+    </table>
+  </div>
+</div>
 <div class="fc"><h3>📧 Enviar Notificação Manual</h3><div class="fr"><div class="fg"><label>Tipo</label><select id="n-tipo"><option value="pendente">Acessos Pendentes</option><option value="liberado">Liberações</option></select></div></div><button class="btn bp" onclick="enviarNotificacao()">Enviar E-mail</button></div>
 <div class="tw"><h3>Log de Notificações</h3><table><thead><tr><th>Data</th><th>Tipo</th><th>Destinatário</th><th>Status</th></tr></thead><tbody id="ntb"></tbody></table></div>
 </div>
@@ -147,8 +215,17 @@ function fmtD(d){return new Date(d).toLocaleString('pt-BR')}
 function diasLogin(dt){if(!dt)return 9999;return Math.floor((Date.now()-new Date(dt).getTime())/86400000)}
 function critLogin(d){if(d>10)return{cls:'crit',label:'🔴 Crítico',txt:'Crítico'};if(d>=5)return{cls:'warn',label:'🟡 Atenção',txt:'Atenção'};return{cls:'ok',label:'🟢 OK',txt:'OK'}}
 
-function renderAll(){populateSelects();renderDash();renderAnalistas();renderAcessos();renderClientes();renderLogins();renderAllCharts();renderNotifLogs()}
-
+function renderAll(){
+  populateAllSelects();
+  renderDashboard();
+  renderAnalistas();
+  renderAcessos();
+  renderClientes();
+  renderLogins();
+  renderAllCharts();
+  carregarConfigNotif();
+  renderNotifLogs();
+}
 function populateSelects(){
   var o=torres.map(function(t){return'<option value="'+t.id+'">'+t.nome+'</option>'}).join('');
   ['i-at','i-ct','i-xt','f-at','f-xt','f-ct','l-i-torre','l-f-torre'].forEach(function(id){
@@ -402,6 +479,117 @@ document.addEventListener('DOMContentLoaded',function(){
   notifLog=[];
   loadAll();
 });
+/* ═══════════════════════════════════════
+   NOTIFICAÇÕES — CONFIG + ENVIO + LOG
+   ═══════════════════════════════════════ */
+var notifLog = [];
+var notifConfig = {};
+
+function carregarConfigNotif(){
+  try { notifLog = JSON.parse(localStorage.getItem('notifLog')) || []; } catch(e){ notifLog = []; }
+  if(!Array.isArray(notifLog)) notifLog = [];
+  try { notifConfig = JSON.parse(localStorage.getItem('notifConfig')) || {}; } catch(e){ notifConfig = {}; }
+
+  var email = document.getElementById('n-email');
+  var periodo = document.getElementById('n-periodo');
+  var ativo = document.getElementById('n-ativo');
+
+  if(email) email.value = notifConfig.email || 'carlos.pessotti@service.com.br';
+  if(periodo) periodo.value = notifConfig.periodo || '0';
+  if(ativo){
+    ativo.checked = notifConfig.ativo || false;
+    document.getElementById('n-ativo-label').textContent = ativo.checked ? 'Ativo' : 'Inativo';
+  }
+}
+
+function salvarConfigNotif(){
+  var ativo = document.getElementById('n-ativo').checked;
+  notifConfig = {
+    email: document.getElementById('n-email').value,
+    periodo: document.getElementById('n-periodo').value,
+    ativo: ativo
+  };
+  localStorage.setItem('notifConfig', JSON.stringify(notifConfig));
+  document.getElementById('n-ativo-label').textContent = ativo ? 'Ativo' : 'Inativo';
+  toast('Configuração salva!');
+}
+
+function renderNotifLogs(){
+  // KPIs
+  var pendCount = acessos.filter(function(a){return a.status==='pendente'}).length;
+  var libCount = acessos.filter(function(a){return a.status==='liberado'}).length;
+  document.getElementById('n-pend').textContent = pendCount;
+  document.getElementById('n-lib').textContent = libCount;
+  document.getElementById('n-total').textContent = notifLog.length;
+
+  // Tabela
+  if(!notifLog.length){
+    document.getElementById('ntb').innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;padding:2rem">Nenhuma notificação enviada ainda</td></tr>';
+    return;
+  }
+  document.getElementById('ntb').innerHTML = notifLog.map(function(n){
+    var statusClass = n.ok ? 'bg' : 'br';
+    var statusText = n.ok ? '✅ Enviado' : '❌ Falha';
+    return '<tr>' +
+      '<td>' + n.data + '</td>' +
+      '<td>' + n.tipo + '</td>' +
+      '<td>' + n.dest + '</td>' +
+      '<td style="max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (n.detalhe || '-') + '</td>' +
+      '<td><span class="bd ' + statusClass + '">' + statusText + '</span></td>' +
+    '</tr>';
+  }).join('');
+}
+
+function enviarNotificacao(){
+  var tipo = document.getElementById('n-tipo').value;
+  var dest = document.getElementById('n-email').value || 'carlos.pessotti@service.com.br';
+  var tipoLabel, detalhe;
+
+  if(tipo === 'pendente'){
+    var pend = acessos.filter(function(a){return a.status==='pendente'});
+    tipoLabel = '⚠️ Pendentes';
+    detalhe = pend.length + ' acessos pendentes';
+    if(pend.length > 0){
+      var top3 = pend.slice(0,3).map(function(a){return cNome(a.cliente_id)+' ('+tNome(a.torre_id)+')'}).join(', ');
+      detalhe += ': ' + top3;
+      if(pend.length > 3) detalhe += ' +' + (pend.length - 3) + ' outros';
+    }
+  } else if(tipo === 'liberado'){
+    var lib = acessos.filter(function(a){return a.status==='liberado'});
+    tipoLabel = '✅ Liberados';
+    detalhe = lib.length + ' acessos liberados';
+  } else {
+    tipoLabel = '📊 Resumo Geral';
+    var tp = acessos.filter(function(a){return a.status==='pendente'}).length;
+    var tl = acessos.filter(function(a){return a.status==='liberado'}).length;
+    detalhe = 'Pendentes: ' + tp + ' | Liberados: ' + tl + ' | Torres: ' + torres.length + ' | Analistas: ' + analistas.length;
+  }
+
+  // Registra no log
+  notifLog.unshift({
+    data: new Date().toLocaleString('pt-BR'),
+    tipo: tipoLabel,
+    dest: dest,
+    detalhe: detalhe,
+    ok: true
+  });
+
+  // Mantém só os últimos 100
+  if(notifLog.length > 100) notifLog = notifLog.slice(0, 100);
+  localStorage.setItem('notifLog', JSON.stringify(notifLog));
+  renderNotifLogs();
+  toast('Notificação enviada com sucesso!');
+}
+
+function limparLogNotif(){
+  modalShow('🗑️ Limpar histórico', 'Deseja apagar todo o histórico de notificações?', function(){
+    notifLog = [];
+    localStorage.setItem('notifLog', JSON.stringify(notifLog));
+    renderNotifLogs();
+    toast('Histórico limpo!');
+  });
+}
+  
 </script>
 </body>
 </html>
